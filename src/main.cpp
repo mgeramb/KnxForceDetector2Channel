@@ -14,11 +14,12 @@ Adafruit_NeoPixel pixels(1, PIN_NEOPIXEL);
 #define SENSOR_POLLING_INTERVAL_MS 1000
 #define LIFETICK_INTERVAL_MS 60000
 
-GroupObject* goLifeTick;
-GroupObject* goEnableDiagnostic;
+GroupObject* goLifeTickCounter = NULL;
+GroupObject* goLifeTick = NULL;
+GroupObject* goEnableDiagnostic = NULL;
 
-ForceSensor forceSensor1 = ForceSensor(PIN_FORCE1, "Force 1");
-ForceSensor forceSensor2 = ForceSensor(PIN_FORCE2, "Force 2");
+ForceSensor *forceSensor1 = NULL;
+ForceSensor *forceSensor2 = NULL;
 unsigned long lastLoop = 0;
 unsigned long lastLifeTick = 0;
 unsigned long startTime = 0;
@@ -44,8 +45,8 @@ void callback(GroupObject groupObject)
   {
     diagnosticMode = goEnableDiagnostic->value();
   }
-  forceSensor1.callback(groupObject);
-  forceSensor2.callback(groupObject);
+  forceSensor1->callback(groupObject);
+  forceSensor2->callback(groupObject);
 }
 
 void setup()
@@ -62,18 +63,22 @@ void setup()
   knx.readMemory();
 
   // print values of parameters if device is already configured
-  if (knx.configured() || 1)
+  if (knx.configured())
   {
     Serial.println("Initialize group objects");
- 
+
     int groupIndex = 1;
+    goLifeTickCounter = &knx.getGroupObject(groupIndex++);
+    goLifeTickCounter->dataPointType(DPT_Value_2_Count);
     goLifeTick = &knx.getGroupObject(groupIndex++);
-    goLifeTick->dataPointType(DPT_Value_2_Count);
+    goLifeTick->dataPointType(DPT_Trigger);
+   
     goEnableDiagnostic = &knx.getGroupObject(groupIndex++);
-   //goEnableDiagnostic->callback(callback);
+    goEnableDiagnostic->callback(callback);
     goEnableDiagnostic->dataPointType(DPT_Switch);
-    forceSensor1.initGroupObjects(groupIndex, callback);
-    forceSensor2.initGroupObjects(groupIndex, callback);
+
+    forceSensor1 = new ForceSensor(PIN_FORCE1, "Force 1", groupIndex, callback);
+    forceSensor2 = new ForceSensor(PIN_FORCE1, "Force 2", groupIndex, callback);
     Serial.println("Group objects initialized");
   }
   else
@@ -90,8 +95,8 @@ void loop()
   knx.loop();
 
   // only run the application code if the device was configured with ETS
- // if (!knx.configured())
-  //  return;
+  if (!knx.configured())
+    return;
 
   unsigned long now = millis();
   if (startTime == 0)
@@ -105,17 +110,20 @@ void loop()
       return;
     started = true;
     forceSent = true;
+    Serial.println("Start device");
   }
   if (lastLoop == 0 || now - lastLoop >= SENSOR_POLLING_INTERVAL_MS)
   {
     lastLoop = now;
-    forceSensor1.loop(now, diagnosticMode, forceSent);
-    forceSensor2.loop(now, diagnosticMode, forceSent);
+    forceSensor1->loop(now, diagnosticMode, forceSent);
+    forceSensor2->loop(now, diagnosticMode, forceSent);
   }
   if (forceSent || now - lastLifeTick >= LIFETICK_INTERVAL_MS)
   {
     lastLifeTick = now;
     lifeTick++;
     log("Main", "Lifetick", lifeTick);
+    goLifeTickCounter->value(lifeTick);
+    goLifeTick->value(true);
   }
 }

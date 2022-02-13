@@ -2,26 +2,21 @@
 #include "forceSensor.h"
 #include "log.h"
 
-ForceSensorBase::ForceSensorBase(const char *name)
-    : name(name)
-{
-    
-}
-
-void ForceSensorBase::initGroupObjects(int& groupObjectIndex, GroupObjectUpdatedHandler callback)
+ForceSensorBase::ForceSensorBase(const char *name, int &groupObjectIndex, GroupObjectUpdatedHandler callback)
+    : name(name),
+      goErrorForce(knx.getGroupObject(groupObjectIndex++)),
+      goForce(knx.getGroupObject(groupObjectIndex++)),
+      goForcePercentage(knx.getGroupObject(groupObjectIndex++)),
+      goForceDetected(knx.getGroupObject(groupObjectIndex++)),
+      goManualControlForceDetected(knx.getGroupObject(groupObjectIndex++)),
+      goSetDetectionLimit(knx.getGroupObject(groupObjectIndex++))
 {
     Serial.println("initGroupObjects base");
-    goErrorForce = knx.getGroupObject(1 /*groupObjectIndex++*/);
-    goForce = knx.getGroupObject(1 /*groupObjectIndex++*/);
-    goForcePercentage = knx.getGroupObject(1 /*groupObjectIndex++*/);
-    goForceDetected = knx.getGroupObject(1 /*groupObjectIndex++*/);
-    goManualControlForceDetected = knx.getGroupObject(1 /*groupObjectIndex++*/);
-    goSetDetectionLimit = knx.getGroupObject(1 /*groupObjectIndex++*/);
     goErrorForce.dataPointType(DPT_Switch);
     goForce.dataPointType(DPT_Value_2_Count);
     goForcePercentage.dataPointType(DPT_Percent_U8);
     goForceDetected.dataPointType(DPT_Switch);
-    //goManualControlForceDetected.callback(callback);
+    goManualControlForceDetected.callback(callback);
     goManualControlForceDetected.dataPointType(DPT_Switch);
     goSetDetectionLimit.dataPointType(DPT_Percent_U8);
 }
@@ -35,22 +30,16 @@ void ForceSensorBase::callback(GroupObject& groupObject)
     }
 }
 
-ForceSensor::ForceSensor(uint32_t pin, const char *name) : 
-    ForceSensorBase(name), 
-    pin(pin)
-{
-   
-}
-
-void ForceSensor::initGroupObjects(int& groupObjectIndex, GroupObjectUpdatedHandler callback)
-{
+ForceSensor::ForceSensor(uint32_t pin, const char *name, int& groupObjectIndex, GroupObjectUpdatedHandler callback) : 
+    ForceSensorBase(name, groupObjectIndex, callback), 
+    pin(pin),
+    goSetLowerLimit(knx.getGroupObject(groupObjectIndex++)),
+    goSetUpperLimit(knx.getGroupObject(groupObjectIndex++))
+{ 
     Serial.println("initGroupObjects");
-    ForceSensorBase::initGroupObjects(groupObjectIndex, callback);
-    goSetLowerLimit = knx.getGroupObject(1 /*groupObjectIndex++*/);
-    goSetUpperLimit = knx.getGroupObject(1 /*groupObjectIndex++*/);
-   // goSetLowerLimit.callback(callback);
+    goSetLowerLimit.callback(callback);
     goSetLowerLimit.dataPointType(DPT_Value_2_Count);
-    //goSetUpperLimit.callback(callback);
+    goSetUpperLimit.callback(callback);
     goSetUpperLimit.dataPointType(DPT_Value_2_Count);
 }
 
@@ -103,24 +92,24 @@ void ForceSensor::loop(unsigned long now, bool diagnosticMode, bool forceSent)
     {
         lastRaw = raw;
         log(name, "Send force", lastRaw);
-        //goForce.value(lastRaw);
+        goForce.value(lastRaw);
     }
     if (lastPercent != percent || forceSent)
     {
         lastPercent = percent;
         log(name, "Send percent", lastPercent);
-        //goForcePercentage.value(lastPercent);
+        goForcePercentage.value(lastPercent);
     }
     if (lastError != error || forceSent)
     {
         lastError = error;
         log(name, "Send error", lastError);
-        //goErrorForce.value(lastError);
+        goErrorForce.value(lastError);
     }
     if (lastDetected != detected || forceSent)
     {
         lastDetected = detected;
         log(name, "Send force detected", lastDetected);
-        //goForceDetected.value(detected);
+        goForceDetected.value(detected);
     }
 }
