@@ -14,11 +14,11 @@ ForceSensorBase::ForceSensorBase(const char *name, int &groupObjectIndex, GroupO
     Serial.println("initGroupObjects base");
     goErrorForce.dataPointType(DPT_Switch);
     goForce.dataPointType(DPT_Value_2_Count);
-    goForcePercentage.dataPointType(DPT_Percent_U8);
+    goForcePercentage.dataPointType(DPT_Scaling);
     goForceDetected.dataPointType(DPT_Switch);
     goManualControlForceDetected.callback(callback);
     goManualControlForceDetected.dataPointType(DPT_Switch);
-    goSetDetectionLimit.dataPointType(DPT_Percent_U8);
+    goSetDetectionLimit.dataPointType(DPT_Scaling);
 }
 
 void ForceSensorBase::callback(GroupObject& groupObject)
@@ -58,9 +58,26 @@ void ForceSensor::callback(GroupObject& groupObject)
     }
 }
 
-void ForceSensor::loop(unsigned long now, bool diagnosticMode, bool forceSent)
+uint32_t ForceSensor::getLowerLimit()
 {
-    uint32_t raw = 1023 - analogRead(pin);
+    return lowerLimit;
+}
+
+uint32_t ForceSensor::getUpperLimit()
+{
+    return upperLimit;
+}
+
+uint32_t ForceSensor::getRaw()
+{
+    return 1023 - analogRead(pin);
+}
+
+void ForceSensorBase::loop(unsigned long now, bool diagnosticMode, bool forceSent)
+{
+    uint32_t raw = getRaw();
+    uint32_t lowerLimit = getLowerLimit();
+    uint32_t upperLimit = getUpperLimit();
     bool detected = false;
     bool error = false;
     byte percent = 0;
@@ -112,4 +129,41 @@ void ForceSensor::loop(unsigned long now, bool diagnosticMode, bool forceSent)
         log(name, "Send force detected", lastDetected);
         goForceDetected.value(detected);
     }
+}
+
+
+ForceSensorSum::ForceSensorSum(const char* name, int& groupObjectIndex, GroupObjectUpdatedHandler callback, ForceSensor** sensors, size_t sensorCount)
+    : ForceSensorBase(name, groupObjectIndex, callback),
+    sensors(sensors),
+    sensorCount(sensorCount)
+{
+
+}
+
+uint32_t ForceSensorSum::getLowerLimit()
+{
+    uint32_t lowerLimit = 0;
+    for (size_t i = 0; i < sensorCount; i++)
+    {
+        lowerLimit += sensors[i]->getLowerLimit();
+    }
+    return lowerLimit;
+}
+uint32_t ForceSensorSum::getUpperLimit()
+{
+    uint32_t upperLimit = 0;
+    for (size_t i = 0; i < sensorCount; i++)
+    {
+        upperLimit += sensors[i]->getUpperLimit();
+    }
+    return upperLimit;
+}
+uint32_t ForceSensorSum::getRaw()
+{
+    uint32_t raw = 0;
+    for (size_t i = 0; i < sensorCount; i++)
+    {
+        raw += sensors[i]->getRaw();
+    }
+    return raw;
 }

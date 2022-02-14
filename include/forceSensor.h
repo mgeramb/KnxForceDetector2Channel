@@ -6,7 +6,7 @@
 class ForceSensorBase
 {
 protected:
-  const char *name;
+  const char* name;
   GroupObject& goErrorForce;
   GroupObject& goForce;
   GroupObject& goForcePercentage;
@@ -19,24 +19,41 @@ protected:
   byte lastPercent = 0;
   bool lastError = 0;
   bool lastDetected;
-  ForceSensorBase(const char *name, int& groupObjectIndex, GroupObjectUpdatedHandler callback);
-
+  ForceSensorBase(const char* name, int& groupObjectIndex, GroupObjectUpdatedHandler callback);
 public:
+  virtual uint32_t getLowerLimit() = 0;
+  virtual uint32_t getUpperLimit() = 0;
+  virtual uint32_t getRaw() = 0;
+
   virtual void callback(GroupObject& groupObject);
+  void loop(unsigned long now, bool diagosticMode, bool forceSent);
 };
 
-class ForceSensor : ForceSensorBase
+class ForceSensor : public ForceSensorBase
 {
   uint32_t pin;
   GroupObject& goSetLowerLimit;
   GroupObject& goSetUpperLimit;
   uint16_t lowerLimit = 1;
   uint16_t upperLimit = 1022;
-
 public:
-  ForceSensor(uint32_t pin, const char *name, int& groupObjectIndex, GroupObjectUpdatedHandler callback);
-  void loop(unsigned long now, bool diagosticMode, bool forceSent);
+  virtual uint32_t getLowerLimit();
+  virtual uint32_t getUpperLimit();
+  virtual uint32_t getRaw();
+  ForceSensor(uint32_t pin, const char* name, int& groupObjectIndex, GroupObjectUpdatedHandler callback);
   virtual void callback(GroupObject& groupObject);
 };
+
+class ForceSensorSum : public ForceSensorBase
+{
+  ForceSensor** sensors;
+  size_t sensorCount;
+public:
+  virtual uint32_t getLowerLimit();
+  virtual uint32_t getUpperLimit();
+  virtual uint32_t getRaw();
+  ForceSensorSum(const char* name, int& groupObjectIndex, GroupObjectUpdatedHandler callback, ForceSensor** sensors, size_t sensorCount);
+};
+
 
 #endif

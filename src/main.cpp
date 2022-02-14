@@ -20,6 +20,7 @@ GroupObject* goEnableDiagnostic = NULL;
 
 ForceSensor *forceSensor1 = NULL;
 ForceSensor *forceSensor2 = NULL;
+ForceSensorSum *forceSensorSum = NULL;
 unsigned long lastLoop = 0;
 unsigned long lastLifeTick = 0;
 unsigned long startTime = 0;
@@ -79,6 +80,9 @@ void setup()
 
     forceSensor1 = new ForceSensor(PIN_FORCE1, "Force 1", groupIndex, callback);
     forceSensor2 = new ForceSensor(PIN_FORCE1, "Force 2", groupIndex, callback);
+    ForceSensor** allSensors = new ForceSensor*[2]{forceSensor1, forceSensor2};
+    forceSensorSum = new ForceSensorSum("Sum", groupIndex, callback, allSensors, 2);
+
     Serial.println("Group objects initialized");
   }
   else
@@ -117,6 +121,7 @@ void loop()
     lastLoop = now;
     forceSensor1->loop(now, diagnosticMode, forceSent);
     forceSensor2->loop(now, diagnosticMode, forceSent);
+    forceSensorSum->loop(now, diagnosticMode, forceSent);
   }
   if (forceSent || now - lastLifeTick >= LIFETICK_INTERVAL_MS)
   {
