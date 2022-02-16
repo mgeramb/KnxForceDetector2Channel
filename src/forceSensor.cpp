@@ -128,6 +128,11 @@ void ForceSensorBase::loop(unsigned long now, bool diagnosticMode, bool forceSen
     }
 }
 
+bool ForceSensorBase::getLastDetected()
+{
+    return lastDetected;
+}
+
 ForceSensor::ForceSensor(uint32_t pin, const char *name, int& groupObjectIndex, uint32_t& parameterAddress, GroupObjectUpdatedHandler callback) : 
     ForceSensorBase(name, groupObjectIndex, parameterAddress, callback), 
     pin(pin),
@@ -158,12 +163,14 @@ void ForceSensor::callback(GroupObject& groupObject)
 
 void ForceSensor::writeState(StateWriter& stateWriter)
 {
+    ForceSensorBase::writeState(stateWriter);
     stateWriter.writeWord(lowerLimit);
     stateWriter.writeWord(upperLimit);
 }
 
 void ForceSensor::readState(StateReader& stateReader)
 {
+    ForceSensorBase::readState(stateReader);
     lowerLimit = stateReader.readWord();
     if (lowerLimit == 0xFFFF)
     {
@@ -197,9 +204,33 @@ uint32_t ForceSensor::getRaw()
 ForceSensorSum::ForceSensorSum(const char* name, int& groupObjectIndex, uint32_t& parameterAddress, GroupObjectUpdatedHandler callback, ForceSensor** sensors, size_t sensorCount)
     : ForceSensorBase(name, groupObjectIndex, parameterAddress, callback),
     sensors(sensors),
-    sensorCount(sensorCount)
+    sensorCount(sensorCount),
+    goDetectedAny(knx.getGroupObject(groupObjectIndex))
 {
 
+}
+
+void ForceSensorSum::loop(unsigned long now, bool diagnosticMode, bool forceSent)
+{
+    ForceSensorBase::loop(now, diagnosticMode, forceSent);
+    bool anyDetected = getLastDetected();
+    if (!anyDetected)
+    {
+        for (size_t i = 0; i < sensorCount; i++)
+        {
+            if (sensors[i]->getLastDetected())
+            {
+                anyDetected = true;
+                break;
+            }
+        }
+    }
+    if (lastAnyDetected != anyDetected || forceSent)
+    {
+        lastAnyDetected = anyDetected;
+        logValue(name, "Send DetectedAny", lastAnyDetected);
+        goDetectedAny.value(lastRaw);
+    }
 }
 
 uint32_t ForceSensorSum::getLowerLimit()

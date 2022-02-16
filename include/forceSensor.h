@@ -34,11 +34,11 @@ public:
   virtual uint32_t getLowerLimit() = 0;
   virtual uint32_t getUpperLimit() = 0;
   virtual uint32_t getRaw() = 0;
-
-  virtual void callback(GroupObject& groupObject);
+  virtual bool getLastDetected();
+  virtual void callback(GroupObject &groupObject);
   virtual void writeState(StateWriter& stateWriter);
   virtual void readState(StateReader& stateReader);
-  void loop(unsigned long now, bool diagosticMode, bool forceSent);
+  virtual void loop(unsigned long now, bool diagosticMode, bool forceSent);
 };
 
 class ForceSensor : public ForceSensorBase
@@ -63,11 +63,15 @@ class ForceSensorSum : public ForceSensorBase
 {
   ForceSensor** sensors;
   size_t sensorCount;
+  GroupObject& goDetectedAny;
+  bool lastAnyDetected = false;
+
 public:
   virtual uint32_t getLowerLimit();
   virtual uint32_t getUpperLimit();
   virtual uint32_t getRaw();
   ForceSensorSum(const char* name, int& groupObjectIndex, uint32_t& parameterAddress, GroupObjectUpdatedHandler callback, ForceSensor** sensors, size_t sensorCount);
+  virtual void loop(unsigned long now, bool diagosticMode, bool forceSent);
 };
 
 
