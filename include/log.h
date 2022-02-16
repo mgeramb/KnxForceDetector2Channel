@@ -1,6 +1,6 @@
 #ifndef LOG_H
 #define LOG_H
 
-void log(const char *name, const char *operation, float value);
+void logValue(const char *name, const char *operation, float value);
 
 #endif

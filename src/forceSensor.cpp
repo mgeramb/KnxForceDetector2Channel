@@ -1,15 +1,17 @@
 #include <knx.h>
 #include "forceSensor.h"
 #include "log.h"
+#include "parameters.h"
 
-ForceSensorBase::ForceSensorBase(const char *name, int &groupObjectIndex, GroupObjectUpdatedHandler callback)
+ForceSensorBase::ForceSensorBase(const char *name, int &groupObjectIndex, uint32_t& parameterAddress, GroupObjectUpdatedHandler callback)
     : name(name),
       goErrorForce(knx.getGroupObject(groupObjectIndex++)),
       goForce(knx.getGroupObject(groupObjectIndex++)),
       goForcePercentage(knx.getGroupObject(groupObjectIndex++)),
       goForceDetected(knx.getGroupObject(groupObjectIndex++)),
       goManualControlForceDetected(knx.getGroupObject(groupObjectIndex++)),
-      goSetDetectionLimit(knx.getGroupObject(groupObjectIndex++))
+      goSetDetectionLimit(knx.getGroupObject(groupObjectIndex++)),
+      hysterese(readKnxParameterUInt32(name, "Hysterese", parameterAddress))
 {
     Serial.println("initGroupObjects base");
     goErrorForce.dataPointType(DPT_Switch);
@@ -26,51 +28,37 @@ void ForceSensorBase::callback(GroupObject& groupObject)
     if (&goSetDetectionLimit == &groupObject)
     {
         detectionLimit = goSetDetectionLimit.value();
-        log(name, "Detection limit received", detectionLimit);
+        logValue(name, "Detection limit received", detectionLimit);
     }
-}
-
-ForceSensor::ForceSensor(uint32_t pin, const char *name, int& groupObjectIndex, GroupObjectUpdatedHandler callback) : 
-    ForceSensorBase(name, groupObjectIndex, callback), 
-    pin(pin),
-    goSetLowerLimit(knx.getGroupObject(groupObjectIndex++)),
-    goSetUpperLimit(knx.getGroupObject(groupObjectIndex++))
-{ 
-    Serial.println("initGroupObjects");
-    goSetLowerLimit.callback(callback);
-    goSetLowerLimit.dataPointType(DPT_Value_2_Count);
-    goSetUpperLimit.callback(callback);
-    goSetUpperLimit.dataPointType(DPT_Value_2_Count);
-}
-
-void ForceSensor::callback(GroupObject& groupObject)
-{
-    ForceSensorBase::callback(groupObject);
-    if (&goSetLowerLimit == &groupObject)
+     if (&goManualControlForceDetected == &groupObject)
     {
-        lowerLimit = goSetLowerLimit.value();
-        log(name, "Lower limit received", detectionLimit);
+        manualControlForceDetected = (ManualControl)  (uint8_t) goManualControlForceDetected.value();
+        logValue(name, "Detection limit received", detectionLimit);
     }
-    else if (&goSetUpperLimit == &groupObject)
+}
+
+void ForceSensorBase::writeState(StateWriter& stateWriter)
+{
+    stateWriter.writeByte(detectionLimit);
+    stateWriter.writeByte(manualControlForceDetected);
+}
+
+void ForceSensorBase::readState(StateReader& stateReader)
+{
+    detectionLimit = stateReader.readByte();
+    if (detectionLimit == 0xFF)
     {
-        upperLimit = goSetLowerLimit.value();
-        log(name, "Upper limit received", detectionLimit);
+        detectionLimit = 50;
+        goSetDetectionLimit.requestObjectRead();
     }
-}
-
-uint32_t ForceSensor::getLowerLimit()
-{
-    return lowerLimit;
-}
-
-uint32_t ForceSensor::getUpperLimit()
-{
-    return upperLimit;
-}
-
-uint32_t ForceSensor::getRaw()
-{
-    return 1023 - analogRead(pin);
+    goSetDetectionLimit.valueNoSend(detectionLimit);
+    manualControlForceDetected = (ManualControl)stateReader.readByte();
+    if (manualControlForceDetected == 0xFF)
+    {
+        manualControlForceDetected = ManualControl::ForceOff;
+        goManualControlForceDetected.requestObjectRead();
+    }
+    goManualControlForceDetected.valueNoSend((byte) manualControlForceDetected);
 }
 
 void ForceSensorBase::loop(unsigned long now, bool diagnosticMode, bool forceSent)
@@ -97,43 +85,117 @@ void ForceSensorBase::loop(unsigned long now, bool diagnosticMode, bool forceSen
     {
         float onePercent = ((float)(upperLimit - lowerLimit)) / (float)100;
         percent = (byte)((float)(raw - lowerLimit) / onePercent);
-        if (percent >= detectionLimit)
+        byte currentDetectionLimit = detectionLimit;
+        if (lastDetected)
+        {
+            currentDetectionLimit =- hysterese;
+            if (currentDetectionLimit < 1)
+                currentDetectionLimit = 1;
+        }
+        if (percent >= currentDetectionLimit)
             detected = true;
     }
     
-    if (manualControlForceDetected)
+    if (manualControlForceDetected == ManualControl::ForceOn)
         detected = true;
+    if (manualControlForceDetected == ManualControl::ForceOff)
+        detected = false;
     if (!diagnosticMode)
         raw = 0;
     if (lastRaw != raw || forceSent)
     {
         lastRaw = raw;
-        log(name, "Send force", lastRaw);
+        logValue(name, "Send force", lastRaw);
         goForce.value(lastRaw);
     }
     if (lastPercent != percent || forceSent)
     {
         lastPercent = percent;
-        log(name, "Send percent", lastPercent);
+        logValue(name, "Send percent", lastPercent);
         goForcePercentage.value(lastPercent);
     }
     if (lastError != error || forceSent)
     {
         lastError = error;
-        log(name, "Send error", lastError);
+        logValue(name, "Send error", lastError);
         goErrorForce.value(lastError);
     }
     if (lastDetected != detected || forceSent)
     {
         lastDetected = detected;
-        log(name, "Send force detected", lastDetected);
+        logValue(name, "Send force detected", lastDetected);
         goForceDetected.value(detected);
     }
 }
 
+ForceSensor::ForceSensor(uint32_t pin, const char *name, int& groupObjectIndex, uint32_t& parameterAddress, GroupObjectUpdatedHandler callback) : 
+    ForceSensorBase(name, groupObjectIndex, parameterAddress, callback), 
+    pin(pin),
+    goSetLowerLimit(knx.getGroupObject(groupObjectIndex++)),
+    goSetUpperLimit(knx.getGroupObject(groupObjectIndex++))
+{
+    Serial.println("initGroupObjects");
+    goSetLowerLimit.callback(callback);
+    goSetLowerLimit.dataPointType(DPT_Value_2_Count);
+    goSetUpperLimit.callback(callback);
+    goSetUpperLimit.dataPointType(DPT_Value_2_Count);
+}
 
-ForceSensorSum::ForceSensorSum(const char* name, int& groupObjectIndex, GroupObjectUpdatedHandler callback, ForceSensor** sensors, size_t sensorCount)
-    : ForceSensorBase(name, groupObjectIndex, callback),
+void ForceSensor::callback(GroupObject& groupObject)
+{
+    ForceSensorBase::callback(groupObject);
+    if (&goSetLowerLimit == &groupObject)
+    {
+        lowerLimit = goSetLowerLimit.value();
+        logValue(name, "Lower limit received", detectionLimit);
+    }
+    else if (&goSetUpperLimit == &groupObject)
+    {
+        upperLimit = goSetLowerLimit.value();
+        logValue(name, "Upper limit received", detectionLimit);
+    }
+}
+
+void ForceSensor::writeState(StateWriter& stateWriter)
+{
+    stateWriter.writeWord(lowerLimit);
+    stateWriter.writeWord(upperLimit);
+}
+
+void ForceSensor::readState(StateReader& stateReader)
+{
+    lowerLimit = stateReader.readWord();
+    if (lowerLimit == 0xFFFF)
+    {
+        lowerLimit = 1;
+        goSetLowerLimit.requestObjectRead();
+    }
+    goSetLowerLimit.valueNoSend(lowerLimit);
+    upperLimit = stateReader.readWord();
+    if (upperLimit == 0xFFFF)
+    {
+        goSetUpperLimit.requestObjectRead();
+    }
+    goSetUpperLimit.valueNoSend(upperLimit);
+}
+
+uint32_t ForceSensor::getLowerLimit()
+{
+    return lowerLimit;
+}
+
+uint32_t ForceSensor::getUpperLimit()
+{
+    return upperLimit;
+}
+
+uint32_t ForceSensor::getRaw()
+{
+    return 1023 - analogRead(pin);
+}
+
+ForceSensorSum::ForceSensorSum(const char* name, int& groupObjectIndex, uint32_t& parameterAddress, GroupObjectUpdatedHandler callback, ForceSensor** sensors, size_t sensorCount)
+    : ForceSensorBase(name, groupObjectIndex, parameterAddress, callback),
     sensors(sensors),
     sensorCount(sensorCount)
 {
