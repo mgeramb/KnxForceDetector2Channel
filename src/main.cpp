@@ -12,7 +12,7 @@ Adafruit_NeoPixel pixels(1, PIN_NEOPIXEL);
 #define PIN_FORCE1 0
 #define PIN_FORCE2 1
 #define PIN_PROG_BUTTON 2
-#define STATE_MEMORY_SIZE 20
+#define STATE_MEMORY_SIZE 36
 
 uint32_t DeviceStartTimeInSeconds = 3;
 uint32_t LifetickInSeconds = 60;

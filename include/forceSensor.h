@@ -29,6 +29,7 @@ protected:
   bool lastError = 0;
   bool lastDetected;
   byte hysterese;
+  byte percentChangeToSent = 1;
   ForceSensorBase(const char* name, int& groupObjectIndex, uint32_t& parameterAddress, GroupObjectUpdatedHandler callback);
 public:
   virtual uint32_t getLowerLimit() = 0;
@@ -50,12 +51,12 @@ class ForceSensor : public ForceSensorBase
   uint16_t upperLimit = 1022;
 
 public:
+  ForceSensor(uint32_t pin, const char *name, int &groupObjectIndex, uint32_t &parameterAddress, GroupObjectUpdatedHandler callback);
   virtual uint32_t getLowerLimit();
   virtual uint32_t getUpperLimit();
   virtual uint32_t getRaw();
   virtual void writeState(StateWriter& stateWriter);
   virtual void readState(StateReader &stateReader);
-  ForceSensor(uint32_t pin, const char *name, int &groupObjectIndex, uint32_t &parameterAddress, GroupObjectUpdatedHandler callback);
   virtual void callback(GroupObject& groupObject);
 };
 
@@ -64,14 +65,18 @@ class ForceSensorSum : public ForceSensorBase
   ForceSensor** sensors;
   size_t sensorCount;
   GroupObject& goDetectedAny;
+  GroupObject& goManualControlDetectedAny;
   bool lastAnyDetected = false;
-
+  ManualControl manualControlDetectedAny;
 public:
+  ForceSensorSum(const char* name, int& groupObjectIndex, uint32_t& parameterAddress, GroupObjectUpdatedHandler callback, ForceSensor** sensors, size_t sensorCount);
   virtual uint32_t getLowerLimit();
   virtual uint32_t getUpperLimit();
   virtual uint32_t getRaw();
-  ForceSensorSum(const char* name, int& groupObjectIndex, uint32_t& parameterAddress, GroupObjectUpdatedHandler callback, ForceSensor** sensors, size_t sensorCount);
   virtual void loop(unsigned long now, bool diagosticMode, bool forceSent);
+  virtual void writeState(StateWriter& stateWriter);
+  virtual void readState(StateReader &stateReader);
+  virtual void callback(GroupObject& groupObject);
 };
 
 

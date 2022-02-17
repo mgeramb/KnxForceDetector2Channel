@@ -14,3 +14,4 @@ uint32_t readKnxParameterUInt32(const char* name, const char* operation, uint32_
     logValue(name, operation, result);
     return result;
 }
+
