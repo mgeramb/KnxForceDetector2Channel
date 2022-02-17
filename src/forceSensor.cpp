@@ -29,11 +29,13 @@ void ForceSensorBase::callback(GroupObject& groupObject)
     {
         detectionLimit = goSetDetectionLimit.value();
         logValue(name, "Detection limit received", detectionLimit);
+        StateWriter::RequestSave();
     }
      if (&goManualControlForceDetected == &groupObject)
     {
         manualControlForceDetected = (ManualControl)  (uint8_t) goManualControlForceDetected.value();
         logValue(name, "Detection limit received", detectionLimit);
+        StateWriter::RequestSave();
     }
 }
 
@@ -153,11 +155,13 @@ void ForceSensor::callback(GroupObject& groupObject)
     {
         lowerLimit = goSetLowerLimit.value();
         logValue(name, "Lower limit received", detectionLimit);
+        StateWriter::RequestSave();
     }
     else if (&goSetUpperLimit == &groupObject)
     {
         upperLimit = goSetLowerLimit.value();
         logValue(name, "Upper limit received", detectionLimit);
+        StateWriter::RequestSave();
     }
 }
 

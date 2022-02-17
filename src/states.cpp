@@ -1,4 +1,28 @@
 #include "states.h"
+#include "log.h"
+
+unsigned long StateWriter::SaveRequestedAt = 0;
+
+void StateWriter::RequestSave()
+{
+    if (SaveRequestedAt == 0)
+    {
+        SaveRequestedAt = millis();
+        if (SaveRequestedAt == 0)
+            SaveRequestedAt = 1;
+        logValue("SaveWriter", "Request Save At", SaveRequestedAt);
+    }
+}
+bool StateWriter::CheckSaveNeededAndResetRequest(long now)
+{
+    if (SaveRequestedAt != 0 && now - SaveRequestedAt > 1000)
+    {
+        SaveRequestedAt = 0;
+        logValue("SaveWriter", "Save At", now);
+        return true;
+    }
+    return false;
+}
 
 StateWriter::StateWriter(uint8_t* buffer) :
     buffer(buffer)

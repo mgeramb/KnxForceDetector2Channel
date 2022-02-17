@@ -142,7 +142,7 @@ void setup()
     forceSensor1 = new ForceSensor(PIN_FORCE1, "Force 1", groupIndex, parameterAddress, callback);
     forceSensor2 = new ForceSensor(PIN_FORCE1, "Force 2", groupIndex, parameterAddress, callback);
     
-    knx.readMemory(); // read again to inialize sensors
+    knx.readMemory(); // read again to inialize sensors state data
 
     ForceSensor **allSensors = new ForceSensor *[2]
     { forceSensor1, forceSensor2 };
@@ -195,5 +195,9 @@ void loop()
     logValue("Main", "Lifetick", lifeTick);
     goLifeTickCounter->value(lifeTick);
     goLifeTick->value(true);
+  }
+  if (StateWriter::CheckSaveNeededAndResetRequest(now))
+  {
+    knx.writeMemory();
   }
 }

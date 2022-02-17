@@ -3,10 +3,17 @@
 
 #include <Arduino.h>
 
+
 class StateWriter
 {
+    static unsigned long SaveRequestedAt;
+public:
+    static void RequestSave();
+    static bool CheckSaveNeededAndResetRequest(long now);
+
+private:
     uint8_t *buffer;
- public:
+public:
     StateWriter(uint8_t* buffer);
     void writeByte(uint8_t value);
     void writeWord(uint16_t value);
