@@ -8,7 +8,7 @@
 				</CatalogSection>
 			</Catalog>
 			<ApplicationPrograms>
-				<ApplicationProgram Id="M-00FA_A-0001-05-0000" ApplicationNumber="1" ApplicationVersion="6" ReplacesVersions="3 4 5" ProgramType="ApplicationProgram" MaskVersion="MV-07B0" Name="Druckdetektor 2 Kanal" LoadProcedureStyle="MergedProcedure" PeiType="0" DefaultLanguage="de" DynamicTableManagement="false" Linkable="false" MinEtsVersion="5.0">
+				<ApplicationProgram Id="M-00FA_A-0001-05-0000" ApplicationNumber="1" ApplicationVersion="5" ProgramType="ApplicationProgram" MaskVersion="MV-07B0" Name="Druckdetektor 2 Kanal" LoadProcedureStyle="MergedProcedure" PeiType="0" DefaultLanguage="de" DynamicTableManagement="false" Linkable="false" MinEtsVersion="5.0" ReplacesVersions="3 4 5">
 					<Static>
 						<Code>
 							<RelativeSegment Id="M-00FA_A-0001-05-0000_RS-04-00000" Name="Parameters" Size="36" LoadStateMachine="4" Offset="0" />
@@ -96,7 +96,7 @@
 							<ComObject Id="M-00FA_A-0001-05-0000_O-23" Name="Druck Vorhanden Summe" Text="Druck Vorhanden Summe" Number="23" FunctionText="Schalten" ObjectSize="1 Bit" ReadFlag="Enabled" WriteFlag="Disabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" UpdateFlag="Disabled" ReadOnInitFlag="Disabled" />
 							<ComObject Id="M-00FA_A-0001-05-0000_O-24" Name="Manuell Steuern Summe" Text="Manuell Steuern Summe" Number="24" FunctionText="Steueren" ObjectSize="2 Bit" ReadFlag="Enabled" WriteFlag="Enabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" UpdateFlag="Enabled" ReadOnInitFlag="Disabled" />
 							<ComObject Id="M-00FA_A-0001-05-0000_O-25" Name="Beliebiger Druck Vorhanden" Text="Beliebiger Druck Vorhanden" Number="25" FunctionText="Schalten" ObjectSize="1 Bit" ReadFlag="Enabled" WriteFlag="Disabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" UpdateFlag="Disabled" ReadOnInitFlag="Disabled" />
-							<ComObject Id="M-00FA_A-0001-05-0000_O-26" Name="Manuell Steuern Beliebiger Druck" Text="Manuell Steuern Beliebiger Druck" Number="26" FunctionText="Steueren" ObjectSize="1 Bit" ReadFlag="Enabled" WriteFlag="Enabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" UpdateFlag="Enabled" ReadOnInitFlag="Disabled" />
+							<ComObject Id="M-00FA_A-0001-05-0000_O-26" Name="Manuell Steuern Beliebiger Druck" Text="Manuell Steuern Beliebiger Druck" Number="26" FunctionText="Steueren" ObjectSize="2 Bit" ReadFlag="Enabled" WriteFlag="Enabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" UpdateFlag="Enabled" ReadOnInitFlag="Disabled" />
 						</ComObjectTable>
 						<ComObjectRefs>
 							<ComObjectRef Id="M-00FA_A-0001-05-0000_O-1_R-1" RefId="M-00FA_A-0001-05-0000_O-1" />
