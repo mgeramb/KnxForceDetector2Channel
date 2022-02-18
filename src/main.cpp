@@ -30,7 +30,7 @@ unsigned long lastLoop = 0;
 unsigned long lastLifeTick = 0;
 unsigned long startTime = 0;
 uint16_t lifeTick = 0;
-bool diagnosticMode = true;
+bool diagnosticMode = false;
 bool started = false;
 
 
@@ -50,6 +50,7 @@ void progLedOn()
 
 uint8_t* saveState(uint8_t* buffer)
 {
+   logValue("Flash", "save called", 0);
   if (forceSensor1 != NULL)
   {
     StateWriter stateWriter(buffer);
@@ -73,6 +74,8 @@ uint8_t* saveState(uint8_t* buffer)
 
 const uint8_t* restoreState(const uint8_t* buffer)
 {
+  logValue("Flash", "restore called", 0);
+
   if (forceSensor1 != NULL)
   {
     StateReader stateReader(buffer);
@@ -95,9 +98,12 @@ const uint8_t* restoreState(const uint8_t* buffer)
 }
 void callback(GroupObject groupObject)
 {
-  if (goEnableDiagnostic == &groupObject)
+  if (ArduinoPlatform::SerialDebug != NULL)
+    ArduinoPlatform::SerialDebug->println("Callback received");
+  if (goEnableDiagnostic->asap() == groupObject.asap())
   {
     diagnosticMode = goEnableDiagnostic->value();
+    logValue("Global", "EnableDiagnostic mode received", diagnosticMode);
   }
   forceSensor1->callback(groupObject);
   forceSensor2->callback(groupObject);
@@ -112,8 +118,8 @@ void setup()
   Serial.println("Hello World!");
 #endif
   ArduinoPlatform::SerialDebug = &Serial;
-  knx.setSaveCallback(saveState);
-  knx.setRestoreCallback(restoreState);
+//  knx.setSaveCallback(saveState);
+//  knx.setRestoreCallback(restoreState);
   knx.setProgLedCallbacks(progLedOff, progLedOn);
   knx.buttonPin(PIN_PROG_BUTTON);
   knx.readMemory();

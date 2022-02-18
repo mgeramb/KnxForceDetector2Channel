@@ -28,13 +28,13 @@ ForceSensorBase::ForceSensorBase(const char *name, int &groupObjectIndex, uint32
 
 void ForceSensorBase::callback(GroupObject &groupObject)
 {
-    if (&goSetDetectionLimit == &groupObject)
+    if (goSetDetectionLimit.asap() == groupObject.asap())
     {
         detectionLimit = goSetDetectionLimit.value();
         logValue(name, "Detection limit received", detectionLimit);
         StateWriter::RequestSave();
     }
-    if (&goManualControlForceDetected == &groupObject)
+    else if (goManualControlForceDetected.asap() == groupObject.asap())
     {
         manualControlForceDetected = (ManualControl)(uint8_t)goManualControlForceDetected.value();
         logValue(name, "Detection limit received", detectionLimit);
@@ -69,6 +69,8 @@ void ForceSensorBase::readState(StateReader &stateReader)
 void ForceSensorBase::loop(unsigned long now, bool diagnosticMode, bool forceSent)
 {
     uint32_t raw = getRaw();
+    if (diagnosticMode)
+        logValue(name, "Read RAW", raw);
     uint32_t lowerLimit = getLowerLimit();
     uint32_t upperLimit = getUpperLimit();
     bool detected = false;
@@ -93,9 +95,10 @@ void ForceSensorBase::loop(unsigned long now, bool diagnosticMode, bool forceSen
         byte currentDetectionLimit = detectionLimit;
         if (lastDetected)
         {
-            currentDetectionLimit = -hysterese;
-            if (currentDetectionLimit < 1)
-                currentDetectionLimit = 1;
+            if (currentDetectionLimit > hysterese)
+                currentDetectionLimit = -hysterese;
+            else 
+                currentDetectionLimit = 0;
         }
         if (percent >= currentDetectionLimit)
             detected = true;
@@ -156,13 +159,13 @@ ForceSensor::ForceSensor(uint32_t pin, const char *name, int &groupObjectIndex, 
 void ForceSensor::callback(GroupObject &groupObject)
 {
     ForceSensorBase::callback(groupObject);
-    if (&goSetLowerLimit == &groupObject)
+    if (goSetLowerLimit.asap() == groupObject.asap())
     {
         lowerLimit = goSetLowerLimit.value();
         logValue(name, "Lower limit received", detectionLimit);
         StateWriter::RequestSave();
     }
-    else if (&goSetUpperLimit == &groupObject)
+    else if (goSetUpperLimit.asap() == groupObject.asap())
     {
         upperLimit = goSetLowerLimit.value();
         logValue(name, "Upper limit received", detectionLimit);
@@ -225,7 +228,7 @@ ForceSensorSum::ForceSensorSum(const char *name, int &groupObjectIndex, uint32_t
 void ForceSensorSum::callback(GroupObject &groupObject)
 {
     ForceSensorBase::callback(groupObject);
-    if (&goManualControlDetectedAny == &groupObject)
+    if (goManualControlDetectedAny.asap() == groupObject.asap())
     {
         manualControlDetectedAny = (ManualControl)(uint8_t)goManualControlDetectedAny.value();
         logValue(name, "Manual control Detected Any received", manualControlDetectedAny);
