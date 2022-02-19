@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <Adafruit_NeoPixel.h>
 #include <knx.h>
+#include <FlashAsEEPROM.h>
 #include "forceSensor.h"
 #include "log.h"
 #include "parameters.h"
@@ -12,16 +13,14 @@ Adafruit_NeoPixel pixels(1, PIN_NEOPIXEL);
 #define PIN_FORCE1 0
 #define PIN_FORCE2 1
 #define PIN_PROG_BUTTON 2
-#define STATE_MEMORY_SIZE 36
 
 uint32_t DeviceStartTimeInSeconds = 3;
 uint32_t LifetickInSeconds = 60;
 uint32_t SensorPollingIntervallInMs = 1000;
 
-
 GroupObject *goLifeTickCounter = NULL;
-GroupObject* goLifeTick = NULL;
-GroupObject* goEnableDiagnostic = NULL;
+GroupObject *goLifeTick = NULL;
+GroupObject *goEnableDiagnostic = NULL;
 
 ForceSensor *forceSensor1 = NULL;
 ForceSensor *forceSensor2 = NULL;
@@ -32,7 +31,6 @@ unsigned long startTime = 0;
 uint16_t lifeTick = 0;
 bool diagnosticMode = false;
 bool started = false;
-
 
 void progLedOff()
 {
@@ -46,60 +44,60 @@ void progLedOn()
   pixels.show();
 }
 
-
-
-uint8_t* saveState(uint8_t* buffer)
+void saveStates()
 {
-   logValue("Flash", "save called", 0);
-  if (forceSensor1 != NULL)
+  uint8_t* eEPROMBuffer = EEPROM.getDataPtr();
+  uint8_t *buffer = eEPROMBuffer + KNX_FLASH_SIZE;
+
+  StateWriter stateWriter(buffer);
+
+  forceSensor1->writeState(stateWriter);
+  forceSensor2->writeState(stateWriter);
+  forceSensorSum->writeState(stateWriter);
+
+  int written = stateWriter.currentBuffer() - buffer;
+  logValue("Flash", "Saved Bytes", written);
+  if (written > EEPROM_EMULATION_SIZE - KNX_FLASH_SIZE && ArduinoPlatform::SerialDebug != NULL)
   {
-    StateWriter stateWriter(buffer);
-
-    forceSensor1->writeState(stateWriter);
-    forceSensor2->writeState(stateWriter);
-    forceSensorSum->writeState(stateWriter);
-
-    int written = stateWriter.currentBuffer() - buffer;
-    logValue("Flash", "Saved Bytes", written);
-    if (written > STATE_MEMORY_SIZE && ArduinoPlatform::SerialDebug != NULL)
-    {
-      ArduinoPlatform::SerialDebug->print("ERROR: To many bytes written. Buffer ");
-      ArduinoPlatform::SerialDebug->print(STATE_MEMORY_SIZE);
-      ArduinoPlatform::SerialDebug->println(" to small");
-      ArduinoPlatform::SerialDebug->println("Increase value of STATE_MEMORY_SIZE.");
-    }
+    ArduinoPlatform::SerialDebug->print("ERROR: To many bytes written. Buffer ");
+    ArduinoPlatform::SerialDebug->print(KNX_FLASH_SIZE);
+    ArduinoPlatform::SerialDebug->println(" to large.");
+    ArduinoPlatform::SerialDebug->print("Decrease value of KNX_FLASH_SIZE to");
+    ArduinoPlatform::SerialDebug->print(EEPROM_EMULATION_SIZE - written);
+    ArduinoPlatform::SerialDebug->println(".");
   }
-  return buffer + STATE_MEMORY_SIZE;
+  EEPROM.commit();
 }
 
-const uint8_t* restoreState(const uint8_t* buffer)
+void restoreStates()
 {
-  logValue("Flash", "restore called", 0);
+  uint8_t *eEPROMBuffer = EEPROM.getDataPtr();
+  const uint8_t *buffer = eEPROMBuffer + KNX_FLASH_SIZE;
+  StateReader stateReader(buffer);
 
-  if (forceSensor1 != NULL)
+  forceSensor1->readState(stateReader);
+  forceSensor2->readState(stateReader);
+  forceSensorSum->readState(stateReader);
+
+  int read = stateReader.currentBuffer() - buffer;
+  logValue("Flash", "Read Bytes", read);
+  if (read > EEPROM_EMULATION_SIZE - KNX_FLASH_SIZE && ArduinoPlatform::SerialDebug != NULL)
   {
-    StateReader stateReader(buffer);
-
-    forceSensor1->readState(stateReader);
-    forceSensor2->readState(stateReader);
-    forceSensorSum->readState(stateReader);
-
-    int read = stateReader.currentBuffer() - buffer;
-    logValue("Flash", "Read Bytes", read);
-    if (read > STATE_MEMORY_SIZE && ArduinoPlatform::SerialDebug != NULL)
-    {
-      ArduinoPlatform::SerialDebug->print("ERROR: To many bytes read. Buffer ");
-      ArduinoPlatform::SerialDebug->print(STATE_MEMORY_SIZE);
-      ArduinoPlatform::SerialDebug->println(" to small.");
-      ArduinoPlatform::SerialDebug->println("Increase value of STATE_MEMORY_SIZE.");
-    }
+    ArduinoPlatform::SerialDebug->print("ERROR: To many bytes written. Buffer ");
+    ArduinoPlatform::SerialDebug->print(KNX_FLASH_SIZE);
+    ArduinoPlatform::SerialDebug->println(" to large.");
+    ArduinoPlatform::SerialDebug->print("Decrease value of KNX_FLASH_SIZE to");
+    ArduinoPlatform::SerialDebug->print(EEPROM_EMULATION_SIZE - read);
+    ArduinoPlatform::SerialDebug->println(".");
   }
-  return buffer + STATE_MEMORY_SIZE;
 }
 void callback(GroupObject groupObject)
 {
   if (ArduinoPlatform::SerialDebug != NULL)
-    ArduinoPlatform::SerialDebug->println("Callback received");
+  {
+    ArduinoPlatform::SerialDebug->print("Callback received for ");
+    ArduinoPlatform::SerialDebug->println(groupObject.asap());
+  }
   if (goEnableDiagnostic->asap() == groupObject.asap())
   {
     diagnosticMode = goEnableDiagnostic->value();
@@ -107,6 +105,7 @@ void callback(GroupObject groupObject)
   }
   forceSensor1->callback(groupObject);
   forceSensor2->callback(groupObject);
+  forceSensorSum->callback(groupObject);
 }
 
 void setup()
@@ -118,19 +117,17 @@ void setup()
   Serial.println("Hello World!");
 #endif
   ArduinoPlatform::SerialDebug = &Serial;
-//  knx.setSaveCallback(saveState);
-//  knx.setRestoreCallback(restoreState);
   knx.setProgLedCallbacks(progLedOff, progLedOn);
   knx.buttonPin(PIN_PROG_BUTTON);
   knx.readMemory();
-
+  
   // print values of parameters if device is already configured
   if (knx.configured())
   {
     Serial.println("Initialize group objects");
 
     uint32_t parameterAddress = 0;
-    
+
     DeviceStartTimeInSeconds = readKnxParameterUInt32("General", "DeviceStartTimeInSeconds", parameterAddress);
     LifetickInSeconds = readKnxParameterUInt32("General", "LifetickInSeconds", parameterAddress);
     SensorPollingIntervallInMs = readKnxParameterUInt32("General", "SensorPollingIntervallInMs", parameterAddress);
@@ -140,27 +137,26 @@ void setup()
     goLifeTickCounter->dataPointType(DPT_Value_2_Count);
     goLifeTick = &knx.getGroupObject(groupIndex++);
     goLifeTick->dataPointType(DPT_Trigger);
-   
+
     goEnableDiagnostic = &knx.getGroupObject(groupIndex++);
     goEnableDiagnostic->callback(callback);
     goEnableDiagnostic->dataPointType(DPT_Switch);
 
     forceSensor1 = new ForceSensor(PIN_FORCE1, "Force 1", groupIndex, parameterAddress, callback);
     forceSensor2 = new ForceSensor(PIN_FORCE1, "Force 2", groupIndex, parameterAddress, callback);
-    
-    knx.readMemory(); // read again to inialize sensors state data
 
-    ForceSensor **allSensors = new ForceSensor *[2]
-    { forceSensor1, forceSensor2 };
-    forceSensorSum = new ForceSensorSum("Sum", groupIndex, parameterAddress, callback, allSensors, 2);
+    forceSensorSum = new ForceSensorSum("Sum", groupIndex, parameterAddress, callback, new ForceSensor *[2]
+    { forceSensor1, forceSensor2 }, 2);
 
-    Serial.println("Group objects initialized");
+    Serial.print(groupIndex - 1);
+    Serial.println(" group objects initialized");
+
+    restoreStates();
   }
   else
   {
     Serial.println("Not yet configured");
   }
-
   Serial.println("Start framework");
   knx.start();
 }
@@ -176,7 +172,7 @@ void loop()
   unsigned long now = millis();
   if (startTime == 0)
   {
-    startTime = now; 
+    startTime = now;
   }
   bool forceSent = false;
   if (!started)
@@ -204,6 +200,6 @@ void loop()
   }
   if (StateWriter::CheckSaveNeededAndResetRequest(now))
   {
-    knx.writeMemory();
+    saveStates();
   }
 }

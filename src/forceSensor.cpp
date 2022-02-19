@@ -16,11 +16,12 @@ ForceSensorBase::ForceSensorBase(const char *name, int &groupObjectIndex, uint32
 {
     Serial.println("initGroupObjects base");
     goErrorForce.dataPointType(DPT_Switch);
-    goForce.dataPointType(DPT_Value_2_Count);
+    goForce.dataPointType(DPT_Value_2_Ucount);
     goForcePercentage.dataPointType(DPT_Scaling);
     goForceDetected.dataPointType(DPT_Switch);
     goManualControlForceDetected.callback(callback);
     goManualControlForceDetected.dataPointType(DPT_Switch_Control);
+    goSetDetectionLimit.callback(callback);
     goSetDetectionLimit.dataPointType(DPT_Scaling);
     if (percentChangeToSent < 1)
         percentChangeToSent = 1;
@@ -36,8 +37,9 @@ void ForceSensorBase::callback(GroupObject &groupObject)
     }
     else if (goManualControlForceDetected.asap() == groupObject.asap())
     {
+        logValue(name, "Manuel control force received RAW", (uint8_t) goManualControlForceDetected.value());
         manualControlForceDetected = (ManualControl)(uint8_t)goManualControlForceDetected.value();
-        logValue(name, "Detection limit received", detectionLimit);
+        logValue(name, "Manuel control force received", manualControlForceDetected);
         StateWriter::RequestSave();
     }
 }
@@ -144,16 +146,17 @@ bool ForceSensorBase::getLastDetected()
     return lastDetected;
 }
 
-ForceSensor::ForceSensor(uint32_t pin, const char *name, int &groupObjectIndex, uint32_t &parameterAddress, GroupObjectUpdatedHandler callback) : ForceSensorBase(name, groupObjectIndex, parameterAddress, callback),
-                                                                                                                                                  pin(pin),
-                                                                                                                                                  goSetLowerLimit(knx.getGroupObject(groupObjectIndex++)),
-                                                                                                                                                  goSetUpperLimit(knx.getGroupObject(groupObjectIndex++))
+ForceSensor::ForceSensor(uint32_t pin, const char *name, int &groupObjectIndex, uint32_t &parameterAddress, GroupObjectUpdatedHandler callback) : 
+    ForceSensorBase(name, groupObjectIndex, parameterAddress, callback),
+    pin(pin),
+    goSetLowerLimit(knx.getGroupObject(groupObjectIndex++)),
+    goSetUpperLimit(knx.getGroupObject(groupObjectIndex++))
 {
     Serial.println("initGroupObjects");
     goSetLowerLimit.callback(callback);
-    goSetLowerLimit.dataPointType(DPT_Value_2_Count);
+    goSetLowerLimit.dataPointType(DPT_Value_2_Ucount);
     goSetUpperLimit.callback(callback);
-    goSetUpperLimit.dataPointType(DPT_Value_2_Count);
+    goSetUpperLimit.dataPointType(DPT_Value_2_Ucount);
 }
 
 void ForceSensor::callback(GroupObject &groupObject)
@@ -162,13 +165,13 @@ void ForceSensor::callback(GroupObject &groupObject)
     if (goSetLowerLimit.asap() == groupObject.asap())
     {
         lowerLimit = goSetLowerLimit.value();
-        logValue(name, "Lower limit received", detectionLimit);
+        logValue(name, "Lower limit received", lowerLimit);
         StateWriter::RequestSave();
     }
     else if (goSetUpperLimit.asap() == groupObject.asap())
     {
-        upperLimit = goSetLowerLimit.value();
-        logValue(name, "Upper limit received", detectionLimit);
+        upperLimit = goSetUpperLimit.value();
+        logValue(name, "Upper limit received", upperLimit);
         StateWriter::RequestSave();
     }
 }
@@ -193,6 +196,7 @@ void ForceSensor::readState(StateReader &stateReader)
     upperLimit = stateReader.readWord();
     if (upperLimit == 0xFFFF)
     {
+        upperLimit = 1023;
         goSetUpperLimit.requestObjectRead();
     }
     goSetUpperLimit.valueNoSend(upperLimit);
@@ -217,12 +221,12 @@ ForceSensorSum::ForceSensorSum(const char *name, int &groupObjectIndex, uint32_t
     : ForceSensorBase(name, groupObjectIndex, parameterAddress, callback),
       sensors(sensors),
       sensorCount(sensorCount),
-      goDetectedAny(knx.getGroupObject(groupObjectIndex)),
-      goManualControlDetectedAny(knx.getGroupObject(groupObjectIndex))
+      goDetectedAny(knx.getGroupObject(groupObjectIndex++)),
+      goManualControlDetectedAny(knx.getGroupObject(groupObjectIndex++))
 {
     goDetectedAny.dataPointType(DPT_Switch);
-    goManualControlForceDetected.callback(callback);
-    goManualControlForceDetected.dataPointType(DPT_Switch_Control);
+    goManualControlDetectedAny.callback(callback);
+    goManualControlDetectedAny.dataPointType(DPT_Switch_Control);
 }
 
 void ForceSensorSum::callback(GroupObject &groupObject)
@@ -237,11 +241,13 @@ void ForceSensorSum::callback(GroupObject &groupObject)
 }
 void ForceSensorSum::writeState(StateWriter &stateWriter)
 {
+    ForceSensorBase::writeState(stateWriter);
     stateWriter.writeByte(manualControlDetectedAny);
 }
 
 void ForceSensorSum::readState(StateReader &stateReader)
 {
+    ForceSensorBase::readState(stateReader);
     manualControlDetectedAny = (ManualControl)stateReader.readByte();
     if (manualControlDetectedAny == 0xFF)
     {

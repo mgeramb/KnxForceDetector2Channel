@@ -15,7 +15,7 @@ void StateWriter::RequestSave()
 }
 bool StateWriter::CheckSaveNeededAndResetRequest(long now)
 {
-    if (SaveRequestedAt != 0 && now - SaveRequestedAt > 1000)
+    if (SaveRequestedAt != 0 && now - SaveRequestedAt > 10000)
     {
         SaveRequestedAt = 0;
         logValue("SaveWriter", "Save At", now);
@@ -37,8 +37,10 @@ void StateWriter::writeByte(uint8_t value)
 
 void StateWriter::writeWord(uint16_t value)
 {
-    *(uint16_t *) buffer = value;
-    buffer += sizeof(uint16_t);
+    *buffer = (uint8_t) (value >> 8);
+    buffer += sizeof(uint8_t);
+    *buffer = (uint8_t) (value & 0xFF);
+    buffer += sizeof(uint8_t);
 }
 
 uint8_t* StateWriter::currentBuffer()
@@ -52,16 +54,21 @@ StateReader::StateReader(const uint8_t* buffer) :
 } 
 
 uint8_t StateReader::readByte()
-{
+{      
     uint8_t result = *buffer;
+    Serial.println(result);
     buffer += sizeof(uint8_t);
     return result;
 }
 
 uint16_t StateReader::readWord()
 {
-    uint16_t result = *(const uint16_t *)buffer;
-    buffer += sizeof(uint16_t);
+    uint16_t result = *buffer;
+    buffer += sizeof(uint8_t);
+    result = result << 8;
+    result |= (uint16_t) *buffer;
+    buffer += sizeof(uint8_t);
+    Serial.println(result);
     return result;
 }
 
