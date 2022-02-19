@@ -4,12 +4,11 @@
 #include <knx.h>
 #include "states.h"
 
-enum ManualControl
+enum LockMode
 {
-  NoForceOff = 0,
-  NoForceOn = 1,
-  ForceOff = 2,
-  ForceOn = 3
+  SwitchToOff = 0,
+  SwitchToOn = 1,
+  LockCurrentState = 2,
 };
 
 class ForceSensorBase
@@ -20,16 +19,17 @@ protected:
   GroupObject& goForce;
   GroupObject& goForcePercentage;
   GroupObject& goForceDetected;
-  GroupObject& goManualControlForceDetected;
+  GroupObject& goLockForceDetected;
   GroupObject& goSetDetectionLimit;
   byte detectionLimit = 0;
-  ManualControl manualControlForceDetected;
   uint32_t lastRaw = 0;
   byte lastPercent = 0;
   bool lastError = 0;
-  bool lastDetected;
   byte hysterese;
   byte percentChangeToSent = 1;
+  bool lastForceDetected;
+  bool lockForceDetected = 0;
+  LockMode lockModeForceDetected;
   ForceSensorBase(const char* name, int& groupObjectIndex, uint32_t& parameterAddress, GroupObjectUpdatedHandler callback);
 public:
   virtual uint32_t getLowerLimit() = 0;
@@ -65,9 +65,10 @@ class ForceSensorSum : public ForceSensorBase
   ForceSensor** sensors;
   size_t sensorCount;
   GroupObject& goDetectedAny;
-  GroupObject& goManualControlDetectedAny;
+  GroupObject& goLockDetectedAny;
   bool lastAnyDetected = false;
-  ManualControl manualControlDetectedAny;
+  bool lockAnyDetected;
+  LockMode lockModeAnyDetected;
 public:
   ForceSensorSum(const char* name, int& groupObjectIndex, uint32_t& parameterAddress, GroupObjectUpdatedHandler callback, ForceSensor** sensors, size_t sensorCount);
   virtual uint32_t getLowerLimit();

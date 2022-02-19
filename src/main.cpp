@@ -117,10 +117,11 @@ void setup()
   Serial.println("Hello World!");
 #endif
   ArduinoPlatform::SerialDebug = &Serial;
-  knx.setProgLedCallbacks(progLedOff, progLedOn);
+  knx.setProgLedOffCallback(progLedOff);
+  knx.setProgLedOnCallback(progLedOn);
   knx.buttonPin(PIN_PROG_BUTTON);
   knx.readMemory();
-  
+
   // print values of parameters if device is already configured
   if (knx.configured())
   {

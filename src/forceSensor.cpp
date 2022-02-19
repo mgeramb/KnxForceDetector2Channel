@@ -9,18 +9,19 @@ ForceSensorBase::ForceSensorBase(const char *name, int &groupObjectIndex, uint32
       goForce(knx.getGroupObject(groupObjectIndex++)),
       goForcePercentage(knx.getGroupObject(groupObjectIndex++)),
       goForceDetected(knx.getGroupObject(groupObjectIndex++)),
-      goManualControlForceDetected(knx.getGroupObject(groupObjectIndex++)),
+      goLockForceDetected(knx.getGroupObject(groupObjectIndex++)),
       goSetDetectionLimit(knx.getGroupObject(groupObjectIndex++)),
       hysterese(readKnxParameterUInt32(name, "Hysterese", parameterAddress)),
-      percentChangeToSent((byte)readKnxParameterUInt32(name, "PercentChangeToSent", parameterAddress))
+      percentChangeToSent((byte)readKnxParameterUInt32(name, "PercentChangeToSent", parameterAddress)),
+      lockModeForceDetected((LockMode)readKnxParameterUInt8(name, "LockModeForceDetected", parameterAddress))
 {
     Serial.println("initGroupObjects base");
     goErrorForce.dataPointType(DPT_Switch);
     goForce.dataPointType(DPT_Value_2_Ucount);
     goForcePercentage.dataPointType(DPT_Scaling);
     goForceDetected.dataPointType(DPT_Switch);
-    goManualControlForceDetected.callback(callback);
-    goManualControlForceDetected.dataPointType(DPT_Switch_Control);
+    goLockForceDetected.callback(callback);
+    goLockForceDetected.dataPointType(DPT_Enable);
     goSetDetectionLimit.callback(callback);
     goSetDetectionLimit.dataPointType(DPT_Scaling);
     if (percentChangeToSent < 1)
@@ -35,11 +36,10 @@ void ForceSensorBase::callback(GroupObject &groupObject)
         logValue(name, "Detection limit received", detectionLimit);
         StateWriter::RequestSave();
     }
-    else if (goManualControlForceDetected.asap() == groupObject.asap())
+    else if (goLockForceDetected.asap() == groupObject.asap())
     {
-        logValue(name, "Manuel control force received RAW", (uint8_t) goManualControlForceDetected.value());
-        manualControlForceDetected = (ManualControl)(uint8_t)goManualControlForceDetected.value();
-        logValue(name, "Manuel control force received", manualControlForceDetected);
+        lockForceDetected = goLockForceDetected.value();
+        logValue(name, "Lock force detected received", lockForceDetected);
         StateWriter::RequestSave();
     }
 }
@@ -47,7 +47,7 @@ void ForceSensorBase::callback(GroupObject &groupObject)
 void ForceSensorBase::writeState(StateWriter &stateWriter)
 {
     stateWriter.writeByte(detectionLimit);
-    stateWriter.writeByte(manualControlForceDetected);
+    stateWriter.writeByte(lockForceDetected ? 1 : 0);
 }
 
 void ForceSensorBase::readState(StateReader &stateReader)
@@ -59,13 +59,17 @@ void ForceSensorBase::readState(StateReader &stateReader)
         goSetDetectionLimit.requestObjectRead();
     }
     goSetDetectionLimit.valueNoSend(detectionLimit);
-    manualControlForceDetected = (ManualControl)stateReader.readByte();
-    if (manualControlForceDetected == 0xFF)
+    byte rowValue = stateReader.readByte();
+    if (rowValue == 0xFF)
     {
-        manualControlForceDetected = ManualControl::ForceOff;
-        goManualControlForceDetected.requestObjectRead();
+        lockForceDetected = false;
+        goSetDetectionLimit.requestObjectRead();
     }
-    goManualControlForceDetected.valueNoSend((byte)manualControlForceDetected);
+    else if (rowValue == 1)
+        lockForceDetected = true;
+    else
+        lockForceDetected = false;
+    goLockForceDetected.valueNoSend(lockForceDetected);
 }
 
 void ForceSensorBase::loop(unsigned long now, bool diagnosticMode, bool forceSent)
@@ -95,7 +99,7 @@ void ForceSensorBase::loop(unsigned long now, bool diagnosticMode, bool forceSen
         float onePercent = ((float)(upperLimit - lowerLimit)) / (float)100;
         percent = ((float)(raw - lowerLimit) / onePercent);
         byte currentDetectionLimit = detectionLimit;
-        if (lastDetected)
+        if (lastForceDetected)
         {
             if (currentDetectionLimit > hysterese)
                 currentDetectionLimit = -hysterese;
@@ -105,11 +109,21 @@ void ForceSensorBase::loop(unsigned long now, bool diagnosticMode, bool forceSen
         if (percent >= currentDetectionLimit)
             detected = true;
     }
-
-    if (manualControlForceDetected == ManualControl::ForceOn)
-        detected = true;
-    if (manualControlForceDetected == ManualControl::ForceOff)
-        detected = false;
+    if (lockForceDetected)
+    {
+        switch (lockModeForceDetected)
+        {
+            case LockMode::LockCurrentState:
+                detected = lastForceDetected;
+                break;
+            case LockMode::SwitchToOff:
+                detected = false;
+                break;
+            case LockMode::SwitchToOn:
+                detected = true;
+                break;
+        }
+    }
     if (!diagnosticMode)
         raw = 0;
     if (lastRaw != raw || forceSent)
@@ -120,7 +134,7 @@ void ForceSensorBase::loop(unsigned long now, bool diagnosticMode, bool forceSen
     }
     if (abs((int)lastPercent - (int)percent) >= (int)percentChangeToSent || // check for enough change
         forceSent ||                                                        // check for force
-        lastDetected != detected ||                                         // check if detected changed
+        lastForceDetected != detected ||                                         // check if detected changed
         (lastPercent != percent && (percent == 0 || percent == 100)))       // check if one limit was reached
     {
         lastPercent = percent;
@@ -133,17 +147,17 @@ void ForceSensorBase::loop(unsigned long now, bool diagnosticMode, bool forceSen
         logValue(name, "Send error", lastError);
         goErrorForce.value(lastError);
     }
-    if (lastDetected != detected || forceSent)
+    if (lastForceDetected != detected || forceSent)
     {
-        lastDetected = detected;
-        logValue(name, "Send force detected", lastDetected);
+        lastForceDetected = detected;
+        logValue(name, "Send force detected", lastForceDetected);
         goForceDetected.value(detected);
     }
 }
 
 bool ForceSensorBase::getLastDetected()
 {
-    return lastDetected;
+    return lastForceDetected;
 }
 
 ForceSensor::ForceSensor(uint32_t pin, const char *name, int &groupObjectIndex, uint32_t &parameterAddress, GroupObjectUpdatedHandler callback) : 
@@ -222,52 +236,53 @@ ForceSensorSum::ForceSensorSum(const char *name, int &groupObjectIndex, uint32_t
       sensors(sensors),
       sensorCount(sensorCount),
       goDetectedAny(knx.getGroupObject(groupObjectIndex++)),
-      goManualControlDetectedAny(knx.getGroupObject(groupObjectIndex++))
+      goLockDetectedAny(knx.getGroupObject(groupObjectIndex++)),
+      lockModeAnyDetected((LockMode)readKnxParameterUInt8(name, "LockModeDetected", parameterAddress))
 {
     goDetectedAny.dataPointType(DPT_Switch);
-    goManualControlDetectedAny.callback(callback);
-    goManualControlDetectedAny.dataPointType(DPT_Switch_Control);
+    goLockDetectedAny.callback(callback);
+    goLockDetectedAny.dataPointType(DPT_Enable);
 }
 
 void ForceSensorSum::callback(GroupObject &groupObject)
 {
     ForceSensorBase::callback(groupObject);
-    if (goManualControlDetectedAny.asap() == groupObject.asap())
+    if (goLockDetectedAny.asap() == groupObject.asap())
     {
-        manualControlDetectedAny = (ManualControl)(uint8_t)goManualControlDetectedAny.value();
-        logValue(name, "Manual control Detected Any received", manualControlDetectedAny);
+        lockAnyDetected = goLockDetectedAny.value();
+        logValue(name, "Manual control Detected Any received", lockAnyDetected);
         StateWriter::RequestSave();
     }
 }
 void ForceSensorSum::writeState(StateWriter &stateWriter)
 {
     ForceSensorBase::writeState(stateWriter);
-    stateWriter.writeByte(manualControlDetectedAny);
+    stateWriter.writeByte(lockAnyDetected ? 1 : 0);
 }
 
 void ForceSensorSum::readState(StateReader &stateReader)
 {
     ForceSensorBase::readState(stateReader);
-    manualControlDetectedAny = (ManualControl)stateReader.readByte();
-    if (manualControlDetectedAny == 0xFF)
+    uint8_t lockAnyDetectedRaw = stateReader.readByte();
+    if (lockAnyDetectedRaw == 0xFF)
     {
-        manualControlDetectedAny = ManualControl::ForceOff;
-        goManualControlDetectedAny.requestObjectRead();
+        lockAnyDetected = false;
+        goLockDetectedAny.requestObjectRead();
     }
-    goManualControlDetectedAny.valueNoSend((byte)manualControlDetectedAny);
+    else if (lockAnyDetected == 1)
+        lockAnyDetected = true;
+    else
+        lockAnyDetected = false;
+    goLockDetectedAny.valueNoSend(lockAnyDetected);
 }
 
 void ForceSensorSum::loop(unsigned long now, bool diagnosticMode, bool forceSent)
 {
     ForceSensorBase::loop(now, diagnosticMode, forceSent);
-    bool anyDetected;
-    if (manualControlForceDetected == ManualControl::ForceOn)
-        anyDetected = true;
-    else if (manualControlForceDetected == ManualControl::ForceOff)
-        anyDetected = false;
-    else
+    bool anyDetected = false;
+    if (lockAnyDetected)
     {
-        anyDetected = getLastDetected();
+        bool anyDetected = getLastDetected();
         if (!anyDetected)
         {
             for (size_t i = 0; i < sensorCount; i++)
@@ -278,6 +293,21 @@ void ForceSensorSum::loop(unsigned long now, bool diagnosticMode, bool forceSent
                     break;
                 }
             }
+        }
+    }
+    else
+    {
+        switch (lockModeAnyDetected)
+        {
+            case LockMode::LockCurrentState:
+                anyDetected = lastAnyDetected;
+                break;
+            case LockMode::SwitchToOff:
+                anyDetected = false;
+                break;
+            case LockMode::SwitchToOn:
+                anyDetected = true;
+                break;
         }
     }
     if (lastAnyDetected != anyDetected || forceSent)
