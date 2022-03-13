@@ -408,21 +408,6 @@ void ForceSensorSum::loop(unsigned long now, bool diagnosticMode, bool forceSent
     bool anyDetected = false;
     if (lockAnyDetected)
     {
-        bool anyDetected = getLastDetected();
-        if (!anyDetected)
-        {
-            for (size_t i = 0; i < sensorCount; i++)
-            {
-                if (sensors[i]->getLastDetected())
-                {
-                    anyDetected = true;
-                    break;
-                }
-            }
-        }
-    }
-    else
-    {
         switch (lockModeAnyDetected)
         {
             case LockMode::LockCurrentState:
@@ -434,6 +419,21 @@ void ForceSensorSum::loop(unsigned long now, bool diagnosticMode, bool forceSent
             case LockMode::SwitchToOn:
                 anyDetected = true;
                 break;
+        }
+    }
+    else
+    {
+        anyDetected = getLastDetected(); // last any detected of sum
+        if (!anyDetected)
+        {
+            for (size_t i = 0; i < sensorCount; i++)
+            {
+                if (sensors[i]->getLastDetected())
+                {
+                    anyDetected = true;
+                    break;
+                }
+            }
         }
     }
     if (lastAnyDetected != anyDetected || forceSent)
