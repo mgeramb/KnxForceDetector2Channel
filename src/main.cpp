@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <Adafruit_NeoPixel.h>
+#include <Adafruit_SleepyDog.h>
 #include <knx.h>
 #include <FlashAsEEPROM.h>
 #include "forceSensor.h"
@@ -7,7 +8,7 @@
 #include "parameters.h"
 #include "states.h"
 
-#define DEBUG
+//#define DEBUG
 // create a pixel strand with 1 pixel on PIN_NEOPIXEL
 Adafruit_NeoPixel pixels(1, PIN_NEOPIXEL);
 #define PIN_FORCE1 0
@@ -29,7 +30,11 @@ unsigned long lastLoop = 0;
 unsigned long lastLifeTick = 0;
 unsigned long startTime = 0;
 uint16_t lifeTick = 0;
+#ifdef DEBUG
+bool diagnosticMode = true;
+#else
 bool diagnosticMode = false;
+#endif
 bool started = false;
 
 void progLedOff()
@@ -110,22 +115,23 @@ void callback(GroupObject groupObject)
 
 void setup()
 {
-  pixels.begin();
 #ifdef DEBUG
   delay(5000);
   Serial.begin(115200);
   Serial.println("Hello World!");
 #endif
+  pixels.begin();
+  Watchdog.enable(60000);
+ 
   ArduinoPlatform::SerialDebug = &Serial;
   knx.setProgLedOffCallback(progLedOff);
   knx.setProgLedOnCallback(progLedOn);
   knx.buttonPin(PIN_PROG_BUTTON);
   knx.readMemory();
 
-  // print values of parameters if device is already configured
   if (knx.configured())
   {
-    Serial.println("Initialize group objects");
+    Serial.println("Initialize group objects and sensors");
 
     uint32_t parameterAddress = 0;
 
@@ -144,7 +150,7 @@ void setup()
     goEnableDiagnostic->dataPointType(DPT_Switch);
 
     forceSensor1 = new ForceSensor(PIN_FORCE1, "Force 1", groupIndex, parameterAddress, callback);
-    forceSensor2 = new ForceSensor(PIN_FORCE1, "Force 2", groupIndex, parameterAddress, callback);
+    forceSensor2 = new ForceSensor(PIN_FORCE2, "Force 2", groupIndex, parameterAddress, callback);
 
     forceSensorSum = new ForceSensorSum("Sum", groupIndex, parameterAddress, callback, new ForceSensor *[2]
     { forceSensor1, forceSensor2 }, 2);
@@ -158,12 +164,13 @@ void setup()
   {
     Serial.println("Not yet configured");
   }
-  Serial.println("Start framework");
+  Serial.println("Start KNX framework");
   knx.start();
 }
 
 void loop()
 {
+  Watchdog.reset();
   knx.loop();
 
   // only run the application code if the device was configured with ETS
@@ -178,6 +185,7 @@ void loop()
   bool forceSent = false;
   if (!started)
   {
+    // KNX Device start delay
     if (now - startTime < DeviceStartTimeInSeconds * 1000)
       return;
     started = true;
@@ -186,6 +194,7 @@ void loop()
   }
   if (lastLoop == 0 || now - lastLoop >= SensorPollingIntervallInMs)
   {
+    // Sensor measurment
     lastLoop = now;
     forceSensor1->loop(now, diagnosticMode, forceSent);
     forceSensor2->loop(now, diagnosticMode, forceSent);
@@ -193,6 +202,7 @@ void loop()
   }
   if (forceSent || now - lastLifeTick >= LifetickInSeconds * 1000)
   {
+    // Lifetick
     lastLifeTick = now;
     lifeTick++;
     logValue("Main", "Lifetick", lifeTick);

@@ -4,162 +4,230 @@
 		<Manufacturer RefId="M-00FA">
 			<Catalog>
 				<CatalogSection Id="M-00FA_CS-1" Name="Geräte" Number="1" DefaultLanguage="de">
-					<CatalogItem Id="M-00FA_H-1-1_HP-0001-04-0000_CI-MGFT2C-1" Name="Druckdetektor 2 Kanal" Number="1" ProductRefId="M-00FA_H-1-1_P-MGFT2C" Hardware2ProgramRefId="M-00FA_H-1-1_HP-0001-04-0000" DefaultLanguage="de" />
+					<CatalogItem Id="M-00FA_H-1-1_HP-0001-06-0000_CI-MGFT2C-1" Name="Druckdetektor 2 Kanal" Number="1" ProductRefId="M-00FA_H-1-1_P-MGFT2C" Hardware2ProgramRefId="M-00FA_H-1-1_HP-0001-06-0000" DefaultLanguage="de" />
 				</CatalogSection>
 			</Catalog>
 			<ApplicationPrograms>
-				<ApplicationProgram Id="M-00FA_A-0001-04-0000" ApplicationNumber="1" ApplicationVersion="4" ProgramType="ApplicationProgram" MaskVersion="MV-07B0" Name="Druckdetektor 2 Kanal" LoadProcedureStyle="MergedProcedure" PeiType="0" DefaultLanguage="de" DynamicTableManagement="false" Linkable="false" MinEtsVersion="5.0" ReplacesVersions="1 2 3">
+				<ApplicationProgram Id="M-00FA_A-0001-06-0000" ApplicationNumber="1" ApplicationVersion="6" ProgramType="ApplicationProgram" MaskVersion="MV-07B0" Name="Druckdetektor 2 Kanal" LoadProcedureStyle="MergedProcedure" PeiType="0" DefaultLanguage="de" DynamicTableManagement="false" Linkable="false" MinEtsVersion="5.0" ReplacesVersions="1 2 3 4 5">
 					<Static>
 						<Code>
-							<RelativeSegment Id="M-00FA_A-0001-04-0000_RS-04-00000" Name="Parameters" Size="40" LoadStateMachine="4" Offset="0" />
+							<RelativeSegment Id="M-00FA_A-0001-06-0000_RS-04-00000" Name="Parameters" Size="47" LoadStateMachine="4" Offset="0" />
 						</Code>
 						<ParameterTypes>
-							<ParameterType Id="M-00FA_A-0001-04-0000_PT-Hystereses" Name="Hystereses">
+							<ParameterType Id="M-00FA_A-0001-06-0000_PT-Hystereses" Name="Hystereses">
 								<TypeNumber SizeInBit="32" Type="signedInt" minInclusive="1" maxInclusive="40" />
 							</ParameterType>
-							<ParameterType Id="M-00FA_A-0001-04-0000_PT-LifeTickIntervalInSeconds" Name="LifeTickIntervalInSeconds">
+							<ParameterType Id="M-00FA_A-0001-06-0000_PT-LifeTickIntervalInSeconds" Name="LifeTickIntervalInSeconds">
 								<TypeNumber SizeInBit="32" Type="signedInt" minInclusive="1" maxInclusive="3600" />
 							</ParameterType>
-							<ParameterType Id="M-00FA_A-0001-04-0000_PT-DeviceStartTimeInSeconds" Name="DeviceStartTimeInSeconds">
+							<ParameterType Id="M-00FA_A-0001-06-0000_PT-DeviceStartTimeInSeconds" Name="DeviceStartTimeInSeconds">
 								<TypeNumber SizeInBit="32" Type="signedInt" minInclusive="1" maxInclusive="60" />
 							</ParameterType>
-							<ParameterType Id="M-00FA_A-0001-04-0000_PT-SensorPollingIntervallInMs" Name="SensorPollingIntervallInMs">
+							<ParameterType Id="M-00FA_A-0001-06-0000_PT-SensorPollingIntervallInMs" Name="SensorPollingIntervallInMs">
 								<TypeNumber SizeInBit="32" Type="signedInt" minInclusive="100" maxInclusive="60000" />
 							</ParameterType>
-							<ParameterType Id="M-00FA_A-0001-04-0000_PT-PercentChangeToSent" Name="PercentChangeToSent">
+							<ParameterType Id="M-00FA_A-0001-06-0000_PT-PercentChangeToSent" Name="PercentChangeToSent">
 								<TypeNumber SizeInBit="32" Type="signedInt" minInclusive="1" maxInclusive="50" />
 							</ParameterType>
-							<ParameterType Id="M-00FA_A-0001-04-0000_PT-LockMode" Name="LockMode">
+							<ParameterType Id="M-00FA_A-0001-06-0000_PT-LockMode" Name="LockMode">
 								<TypeRestriction Base="Value" SizeInBit="8">
-									<Enumeration Text="Setzt Schaltausgang AUS" Value="0" Id="M-00FA_A-0001-04-0000_PT-LockMode_EN-0" />
-									<Enumeration Text="Setzt Schaltausgang EIN" Value="1" Id="M-00FA_A-0001-04-0000_PT-LockMode_EN-1" />
-									<Enumeration Text="Aktuellen Schaltzustand verriegeln" Value="2" Id="M-00FA_A-0001-04-0000_PT-LockMode_EN-2" />
+									<Enumeration Text="Setzt Schaltausgang AUS" Value="0" Id="M-00FA_A-0001-06-0000_PT-LockMode_EN-0" />
+									<Enumeration Text="Setzt Schaltausgang EIN" Value="1" Id="M-00FA_A-0001-06-0000_PT-LockMode_EN-1" />
+									<Enumeration Text="Aktuellen Schaltzustand verriegeln" Value="2" Id="M-00FA_A-0001-06-0000_PT-LockMode_EN-2" />
+								</TypeRestriction>
+							</ParameterType>
+							<ParameterType Id="M-00FA_A-0001-06-0000_PT-DelayedSwitchOffTime" Name="DelayedSwitchOffTime">
+								<TypeRestriction Base="Value" SizeInBit="8">
+									<Enumeration Text="1 Sekunde" Value="0" Id="M-00FA_A-0001-06-0000_PT-DelayedSwitchOffTime_EN-0" />
+									<Enumeration Text="10 Sekunden" Value="1" Id="M-00FA_A-0001-06-0000_PT-DelayedSwitchOffTime_EN-1" />
+									<Enumeration Text="30 Sekunden" Value="2" Id="M-00FA_A-0001-06-0000_PT-DelayedSwitchOffTime_EN-2" />
+									<Enumeration Text="1 Minute" Value="3" Id="M-00FA_A-0001-06-0000_PT-DelayedSwitchOffTime_EN-3" />
+									<Enumeration Text="2 Minuten" Value="4" Id="M-00FA_A-0001-06-0000_PT-DelayedSwitchOffTime_EN-4" />
+									<Enumeration Text="5 Minuten" Value="5" Id="M-00FA_A-0001-06-0000_PT-DelayedSwitchOffTime_EN-5" />
+									<Enumeration Text="10 Minuten" Value="6" Id="M-00FA_A-0001-06-0000_PT-DelayedSwitchOffTime_EN-6" />
+									<Enumeration Text="15 Minuten" Value="7" Id="M-00FA_A-0001-06-0000_PT-DelayedSwitchOffTime_EN-7" />
+									<Enumeration Text="30 Minuten" Value="8" Id="M-00FA_A-0001-06-0000_PT-DelayedSwitchOffTime_EN-8" />
+									<Enumeration Text="1 Stunde" Value="9" Id="M-00FA_A-0001-06-0000_PT-DelayedSwitchOffTime_EN-9" />
+									<Enumeration Text="2 Stunden" Value="10" Id="M-00FA_A-0001-06-0000_PT-DelayedSwitchOffTime_EN-10" />
+									<Enumeration Text="3 Stunden" Value="11" Id="M-00FA_A-0001-06-0000_PT-DelayedSwitchOffTime_EN-11" />
+									<Enumeration Text="4 Stunden" Value="12" Id="M-00FA_A-0001-06-0000_PT-DelayedSwitchOffTime_EN-12" />
+									<Enumeration Text="5 Stunden" Value="13" Id="M-00FA_A-0001-06-0000_PT-DelayedSwitchOffTime_EN-13" />
+									<Enumeration Text="6 Stunden" Value="14" Id="M-00FA_A-0001-06-0000_PT-DelayedSwitchOffTime_EN-14" />
+									<Enumeration Text="8 Stunden" Value="16" Id="M-00FA_A-0001-06-0000_PT-DelayedSwitchOffTime_EN-16" />
+									<Enumeration Text="7 Stunden" Value="15" Id="M-00FA_A-0001-06-0000_PT-DelayedSwitchOffTime_EN-15" />
+									<Enumeration Text="9 Stunden" Value="17" Id="M-00FA_A-0001-06-0000_PT-DelayedSwitchOffTime_EN-17" />
+									<Enumeration Text="10 Stunden" Value="18" Id="M-00FA_A-0001-06-0000_PT-DelayedSwitchOffTime_EN-18" />
+									<Enumeration Text="Nur EIN senden" Value="19" Id="M-00FA_A-0001-06-0000_PT-DelayedSwitchOffTime_EN-19" />
+								</TypeRestriction>
+							</ParameterType>
+							<ParameterType Id="M-00FA_A-0001-06-0000_PT-ErrorMode" Name="ErrorMode">
+								<TypeRestriction Base="Value" SizeInBit="8">
+									<Enumeration Text="Schaltet AUS" Value="0" Id="M-00FA_A-0001-06-0000_PT-ErrorMode_EN-0" />
+									<Enumeration Text="Schaltet EIN" Value="1" Id="M-00FA_A-0001-06-0000_PT-ErrorMode_EN-1" />
+									<Enumeration Text="AUS bei Unterlauf, EIN bei Überlauf" Value="2" Id="M-00FA_A-0001-06-0000_PT-ErrorMode_EN-2" />
+									<Enumeration Text="Letzten Schaltzustand beibehalten" Value="3" Id="M-00FA_A-0001-06-0000_PT-ErrorMode_EN-3" />
 								</TypeRestriction>
 							</ParameterType>
 						</ParameterTypes>
 						<Parameters>
-							<Parameter Id="M-00FA_A-0001-04-0000_P-1" Name="DeviceStartTime" ParameterType="M-00FA_A-0001-04-0000_PT-DeviceStartTimeInSeconds" Text="Gerätestartzeit (Sekunden)" Value="3">
-								<Memory CodeSegment="M-00FA_A-0001-04-0000_RS-04-00000" Offset="0" BitOffset="0" />
+							<Parameter Id="M-00FA_A-0001-06-0000_P-1" Name="DeviceStartTime" ParameterType="M-00FA_A-0001-06-0000_PT-DeviceStartTimeInSeconds" Text="Gerätestartzeit (Sekunden)" Value="3">
+								<Memory CodeSegment="M-00FA_A-0001-06-0000_RS-04-00000" Offset="0" BitOffset="0" />
 							</Parameter>
-							<Parameter Id="M-00FA_A-0001-04-0000_P-2" Name="Lifetick" ParameterType="M-00FA_A-0001-04-0000_PT-LifeTickIntervalInSeconds" Text="Lebenszeichen (Sekunden)" Value="60">
-								<Memory CodeSegment="M-00FA_A-0001-04-0000_RS-04-00000" Offset="4" BitOffset="0" />
+							<Parameter Id="M-00FA_A-0001-06-0000_P-2" Name="Lifetick" ParameterType="M-00FA_A-0001-06-0000_PT-LifeTickIntervalInSeconds" Text="Lebenszeichen (Sekunden)" Value="60">
+								<Memory CodeSegment="M-00FA_A-0001-06-0000_RS-04-00000" Offset="4" BitOffset="0" />
 							</Parameter>
-							<Parameter Id="M-00FA_A-0001-04-0000_P-3" Name="Pollinginterval" ParameterType="M-00FA_A-0001-04-0000_PT-SensorPollingIntervallInMs" Text="Sensorabtastrate (Millisekunden)" Value="1000">
-								<Memory CodeSegment="M-00FA_A-0001-04-0000_RS-04-00000" Offset="8" BitOffset="0" />
+							<Parameter Id="M-00FA_A-0001-06-0000_P-3" Name="Pollinginterval" ParameterType="M-00FA_A-0001-06-0000_PT-SensorPollingIntervallInMs" Text="Sensorabtastrate (Millisekunden)" Value="1000">
+								<Memory CodeSegment="M-00FA_A-0001-06-0000_RS-04-00000" Offset="8" BitOffset="0" />
 							</Parameter>
-							<Parameter Id="M-00FA_A-0001-04-0000_P-4" Name="Hystereses1" ParameterType="M-00FA_A-0001-04-0000_PT-Hystereses" Text="Hysterese (Prozent)" Value="5">
-								<Memory CodeSegment="M-00FA_A-0001-04-0000_RS-04-00000" Offset="12" BitOffset="0" />
+							<Parameter Id="M-00FA_A-0001-06-0000_P-4" Name="Hystereses1" ParameterType="M-00FA_A-0001-06-0000_PT-Hystereses" Text="Hysterese (Prozent)" Value="5">
+								<Memory CodeSegment="M-00FA_A-0001-06-0000_RS-04-00000" Offset="12" BitOffset="0" />
 							</Parameter>
-							<Parameter Id="M-00FA_A-0001-04-0000_P-5" Name="PercentChangeToSent1" ParameterType="M-00FA_A-0001-04-0000_PT-PercentChangeToSent" Text="Prozentänderung senden bei (Prozent)" Value="5">
-								<Memory CodeSegment="M-00FA_A-0001-04-0000_RS-04-00000" Offset="16" BitOffset="0" />
+							<Parameter Id="M-00FA_A-0001-06-0000_P-5" Name="PercentChangeToSent1" ParameterType="M-00FA_A-0001-06-0000_PT-PercentChangeToSent" Text="Prozentänderung senden bei (Prozent)" Value="5">
+								<Memory CodeSegment="M-00FA_A-0001-06-0000_RS-04-00000" Offset="16" BitOffset="0" />
 							</Parameter>
-							<Parameter Id="M-00FA_A-0001-04-0000_P-6" Name="LockMode1" ParameterType="M-00FA_A-0001-04-0000_PT-LockMode" Text="Sperrmodus" Value="1">
-								<Memory CodeSegment="M-00FA_A-0001-04-0000_RS-04-00000" Offset="20" BitOffset="0" />
+							<Parameter Id="M-00FA_A-0001-06-0000_P-6" Name="ErrorMode1" ParameterType="M-00FA_A-0001-06-0000_PT-ErrorMode" Text="Fehler" Value="1">
+								<Memory CodeSegment="M-00FA_A-0001-06-0000_RS-04-00000" Offset="20" BitOffset="0" />
 							</Parameter>
-							<Parameter Id="M-00FA_A-0001-04-0000_P-7" Name="Hystereses2" ParameterType="M-00FA_A-0001-04-0000_PT-Hystereses" Text="Hysterese (Prozent)" Value="5">
-								<Memory CodeSegment="M-00FA_A-0001-04-0000_RS-04-00000" Offset="21" BitOffset="0" />
+							<Parameter Id="M-00FA_A-0001-06-0000_P-7" Name="LockMode1" ParameterType="M-00FA_A-0001-06-0000_PT-LockMode" Text="Sperrmodus" Value="1">
+								<Memory CodeSegment="M-00FA_A-0001-06-0000_RS-04-00000" Offset="21" BitOffset="0" />
 							</Parameter>
-							<Parameter Id="M-00FA_A-0001-04-0000_P-8" Name="PercentChangeToSent2" ParameterType="M-00FA_A-0001-04-0000_PT-PercentChangeToSent" Text="Prozentänderung senden bei (Prozent)" Value="5">
-								<Memory CodeSegment="M-00FA_A-0001-04-0000_RS-04-00000" Offset="25" BitOffset="0" />
+							<Parameter Id="M-00FA_A-0001-06-0000_P-8" Name="DelayedOff1" ParameterType="M-00FA_A-0001-06-0000_PT-DelayedSwitchOffTime" Text="Verzögert Aus" Value="18">
+								<Memory CodeSegment="M-00FA_A-0001-06-0000_RS-04-00000" Offset="22" BitOffset="0" />
 							</Parameter>
-							<Parameter Id="M-00FA_A-0001-04-0000_P-9" Name="LockMode2" ParameterType="M-00FA_A-0001-04-0000_PT-LockMode" Text="Sperrmodus" Value="1">
-								<Memory CodeSegment="M-00FA_A-0001-04-0000_RS-04-00000" Offset="29" BitOffset="0" />
+							<Parameter Id="M-00FA_A-0001-06-0000_P-9" Name="Hystereses2" ParameterType="M-00FA_A-0001-06-0000_PT-Hystereses" Text="Hysterese (Prozent)" Value="5">
+								<Memory CodeSegment="M-00FA_A-0001-06-0000_RS-04-00000" Offset="23" BitOffset="0" />
 							</Parameter>
-							<Parameter Id="M-00FA_A-0001-04-0000_P-10" Name="HystereseSum" ParameterType="M-00FA_A-0001-04-0000_PT-Hystereses" Text="Hysterese (Prozent)" Value="5">
-								<Memory CodeSegment="M-00FA_A-0001-04-0000_RS-04-00000" Offset="30" BitOffset="0" />
+							<Parameter Id="M-00FA_A-0001-06-0000_P-10" Name="PercentChangeToSent2" ParameterType="M-00FA_A-0001-06-0000_PT-PercentChangeToSent" Text="Prozentänderung senden bei (Prozent)" Value="5">
+								<Memory CodeSegment="M-00FA_A-0001-06-0000_RS-04-00000" Offset="27" BitOffset="0" />
 							</Parameter>
-							<Parameter Id="M-00FA_A-0001-04-0000_P-11" Name="PercentChangeToSentSum" ParameterType="M-00FA_A-0001-04-0000_PT-PercentChangeToSent" Text="Prozentänderung senden bei (Prozent)" Value="5">
-								<Memory CodeSegment="M-00FA_A-0001-04-0000_RS-04-00000" Offset="34" BitOffset="0" />
+							<Parameter Id="M-00FA_A-0001-06-0000_P-11" Name="ErrorMode2" ParameterType="M-00FA_A-0001-06-0000_PT-ErrorMode" Text="Fehler" Value="1">
+								<Memory CodeSegment="M-00FA_A-0001-06-0000_RS-04-00000" Offset="31" BitOffset="0" />
 							</Parameter>
-							<Parameter Id="M-00FA_A-0001-04-0000_P-12" Name="LockMode2" ParameterType="M-00FA_A-0001-04-0000_PT-LockMode" Text="Sperrmodus Summe" Value="1">
-								<Memory CodeSegment="M-00FA_A-0001-04-0000_RS-04-00000" Offset="38" BitOffset="0" />
+							<Parameter Id="M-00FA_A-0001-06-0000_P-12" Name="LockMode2" ParameterType="M-00FA_A-0001-06-0000_PT-LockMode" Text="Sperrmodus" Value="1">
+								<Memory CodeSegment="M-00FA_A-0001-06-0000_RS-04-00000" Offset="32" BitOffset="0" />
 							</Parameter>
-							<Parameter Id="M-00FA_A-0001-04-0000_P-13" Name="LockMode3" ParameterType="M-00FA_A-0001-04-0000_PT-LockMode" Text="Sperrmodus Beliebiger Druck" Value="1">
-								<Memory CodeSegment="M-00FA_A-0001-04-0000_RS-04-00000" Offset="39" BitOffset="0" />
+							<Parameter Id="M-00FA_A-0001-06-0000_P-13" Name="DelayedOff2" ParameterType="M-00FA_A-0001-06-0000_PT-DelayedSwitchOffTime" Text="Verzögert Aus" Value="18">
+								<Memory CodeSegment="M-00FA_A-0001-06-0000_RS-04-00000" Offset="33" BitOffset="0" />
+							</Parameter>
+							<Parameter Id="M-00FA_A-0001-06-0000_P-14" Name="HystereseSum" ParameterType="M-00FA_A-0001-06-0000_PT-Hystereses" Text="Hysterese (Prozent)" Value="5">
+								<Memory CodeSegment="M-00FA_A-0001-06-0000_RS-04-00000" Offset="34" BitOffset="0" />
+							</Parameter>
+							<Parameter Id="M-00FA_A-0001-06-0000_P-15" Name="PercentChangeToSentSum" ParameterType="M-00FA_A-0001-06-0000_PT-PercentChangeToSent" Text="Prozentänderung senden bei (Prozent)" Value="5">
+								<Memory CodeSegment="M-00FA_A-0001-06-0000_RS-04-00000" Offset="38" BitOffset="0" />
+							</Parameter>
+							<Parameter Id="M-00FA_A-0001-06-0000_P-16" Name="ErrorModeSum" ParameterType="M-00FA_A-0001-06-0000_PT-ErrorMode" Text="Fehler" Value="1">
+								<Memory CodeSegment="M-00FA_A-0001-06-0000_RS-04-00000" Offset="42" BitOffset="0" />
+							</Parameter>
+							<Parameter Id="M-00FA_A-0001-06-0000_P-17" Name="LockModeSum" ParameterType="M-00FA_A-0001-06-0000_PT-LockMode" Text="Sperrmodus" Value="1">
+								<Memory CodeSegment="M-00FA_A-0001-06-0000_RS-04-00000" Offset="43" BitOffset="0" />
+							</Parameter>
+							<Parameter Id="M-00FA_A-0001-06-0000_P-18" Name="DelayedOffSum" ParameterType="M-00FA_A-0001-06-0000_PT-DelayedSwitchOffTime" Text="Verzögert Aus" Value="18">
+								<Memory CodeSegment="M-00FA_A-0001-06-0000_RS-04-00000" Offset="44" BitOffset="0" />
+							</Parameter>
+							<Parameter Id="M-00FA_A-0001-06-0000_P-19" Name="LockModeAny" ParameterType="M-00FA_A-0001-06-0000_PT-LockMode" Text="Sperrmodus" Value="1">
+								<Memory CodeSegment="M-00FA_A-0001-06-0000_RS-04-00000" Offset="45" BitOffset="0" />
+							</Parameter>
+							<Parameter Id="M-00FA_A-0001-06-0000_P-20" Name="DelayedOffAny" ParameterType="M-00FA_A-0001-06-0000_PT-DelayedSwitchOffTime" Text="Verzögert Aus" Value="18">
+								<Memory CodeSegment="M-00FA_A-0001-06-0000_RS-04-00000" Offset="46" BitOffset="0" />
 							</Parameter>
 						</Parameters>
 						<ParameterRefs>
-							<ParameterRef Id="M-00FA_A-0001-04-0000_P-1_R-1" RefId="M-00FA_A-0001-04-0000_P-1" />
-							<ParameterRef Id="M-00FA_A-0001-04-0000_P-2_R-2" RefId="M-00FA_A-0001-04-0000_P-2" />
-							<ParameterRef Id="M-00FA_A-0001-04-0000_P-3_R-3" RefId="M-00FA_A-0001-04-0000_P-3" />
-							<ParameterRef Id="M-00FA_A-0001-04-0000_P-4_R-4" RefId="M-00FA_A-0001-04-0000_P-4" />
-							<ParameterRef Id="M-00FA_A-0001-04-0000_P-5_R-5" RefId="M-00FA_A-0001-04-0000_P-5" />
-							<ParameterRef Id="M-00FA_A-0001-04-0000_P-6_R-6" RefId="M-00FA_A-0001-04-0000_P-6" />
-							<ParameterRef Id="M-00FA_A-0001-04-0000_P-7_R-7" RefId="M-00FA_A-0001-04-0000_P-7" />
-							<ParameterRef Id="M-00FA_A-0001-04-0000_P-8_R-8" RefId="M-00FA_A-0001-04-0000_P-8" />
-							<ParameterRef Id="M-00FA_A-0001-04-0000_P-9_R-9" RefId="M-00FA_A-0001-04-0000_P-9" />
-							<ParameterRef Id="M-00FA_A-0001-04-0000_P-10_R-10" RefId="M-00FA_A-0001-04-0000_P-10" />
-							<ParameterRef Id="M-00FA_A-0001-04-0000_P-11_R-11" RefId="M-00FA_A-0001-04-0000_P-11" />
-							<ParameterRef Id="M-00FA_A-0001-04-0000_P-12_R-12" RefId="M-00FA_A-0001-04-0000_P-12" />
-							<ParameterRef Id="M-00FA_A-0001-04-0000_P-13_R-13" RefId="M-00FA_A-0001-04-0000_P-13" />
+							<ParameterRef Id="M-00FA_A-0001-06-0000_P-1_R-1" RefId="M-00FA_A-0001-06-0000_P-1" />
+							<ParameterRef Id="M-00FA_A-0001-06-0000_P-2_R-2" RefId="M-00FA_A-0001-06-0000_P-2" />
+							<ParameterRef Id="M-00FA_A-0001-06-0000_P-3_R-3" RefId="M-00FA_A-0001-06-0000_P-3" />
+							<ParameterRef Id="M-00FA_A-0001-06-0000_P-4_R-4" RefId="M-00FA_A-0001-06-0000_P-4" />
+							<ParameterRef Id="M-00FA_A-0001-06-0000_P-5_R-5" RefId="M-00FA_A-0001-06-0000_P-5" />
+							<ParameterRef Id="M-00FA_A-0001-06-0000_P-6_R-6" RefId="M-00FA_A-0001-06-0000_P-6" />
+							<ParameterRef Id="M-00FA_A-0001-06-0000_P-7_R-7" RefId="M-00FA_A-0001-06-0000_P-7" />
+							<ParameterRef Id="M-00FA_A-0001-06-0000_P-8_R-8" RefId="M-00FA_A-0001-06-0000_P-8" />
+							<ParameterRef Id="M-00FA_A-0001-06-0000_P-9_R-9" RefId="M-00FA_A-0001-06-0000_P-9" />
+							<ParameterRef Id="M-00FA_A-0001-06-0000_P-10_R-10" RefId="M-00FA_A-0001-06-0000_P-10" />
+							<ParameterRef Id="M-00FA_A-0001-06-0000_P-11_R-11" RefId="M-00FA_A-0001-06-0000_P-11" />
+							<ParameterRef Id="M-00FA_A-0001-06-0000_P-12_R-12" RefId="M-00FA_A-0001-06-0000_P-12" />
+							<ParameterRef Id="M-00FA_A-0001-06-0000_P-13_R-13" RefId="M-00FA_A-0001-06-0000_P-13" />
+							<ParameterRef Id="M-00FA_A-0001-06-0000_P-14_R-14" RefId="M-00FA_A-0001-06-0000_P-14" />
+							<ParameterRef Id="M-00FA_A-0001-06-0000_P-15_R-15" RefId="M-00FA_A-0001-06-0000_P-15" />
+							<ParameterRef Id="M-00FA_A-0001-06-0000_P-16_R-16" RefId="M-00FA_A-0001-06-0000_P-16" />
+							<ParameterRef Id="M-00FA_A-0001-06-0000_P-17_R-17" RefId="M-00FA_A-0001-06-0000_P-17" />
+							<ParameterRef Id="M-00FA_A-0001-06-0000_P-18_R-18" RefId="M-00FA_A-0001-06-0000_P-18" />
+							<ParameterRef Id="M-00FA_A-0001-06-0000_P-19_R-19" RefId="M-00FA_A-0001-06-0000_P-19" />
+							<ParameterRef Id="M-00FA_A-0001-06-0000_P-20_R-20" RefId="M-00FA_A-0001-06-0000_P-20" />
 						</ParameterRefs>
 						<ComObjectTable>
-							<ComObject Id="M-00FA_A-0001-04-0000_O-1" Name="Lebenszeichenzähler" Text="Lebenszeichenzähler" Number="1" FunctionText="In Betrieb zählen" ObjectSize="2 Bytes" ReadFlag="Enabled" WriteFlag="Disabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" UpdateFlag="Disabled" ReadOnInitFlag="Disabled" />
-							<ComObject Id="M-00FA_A-0001-04-0000_O-2" Name="Lebenszeichen" Text="Lebenszeichen" Number="2" FunctionText="In Betrieb" ObjectSize="1 Bit" ReadFlag="Enabled" WriteFlag="Disabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" UpdateFlag="Disabled" ReadOnInitFlag="Disabled" />
-							<ComObject Id="M-00FA_A-0001-04-0000_O-3" Name="Diagnose" Text="Diagnose" Number="3" FunctionText="Aktivieren" ObjectSize="1 Bit" ReadFlag="Enabled" WriteFlag="Enabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" UpdateFlag="Enabled" ReadOnInitFlag="Disabled" />
-							<ComObject Id="M-00FA_A-0001-04-0000_O-4" Name="Fehler Druck 1" Text="Fehler Druck 1" Number="4" FunctionText="Melden" ObjectSize="1 Bit" ReadFlag="Enabled" WriteFlag="Disabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" UpdateFlag="Disabled" ReadOnInitFlag="Disabled" />
-							<ComObject Id="M-00FA_A-0001-04-0000_O-5" Name="Druck RAW 1" Text="Druck RAW 1" Number="5" FunctionText="Druck Senden" ObjectSize="2 Bytes" ReadFlag="Enabled" WriteFlag="Disabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" UpdateFlag="Disabled" ReadOnInitFlag="Disabled" />
-							<ComObject Id="M-00FA_A-0001-04-0000_O-6" Name="Druck Prozent 1" Text="Druck Prozent 1" Number="6" FunctionText="Druck Senden" ObjectSize="1 Byte" ReadFlag="Enabled" WriteFlag="Disabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" UpdateFlag="Disabled" ReadOnInitFlag="Disabled" />
-							<ComObject Id="M-00FA_A-0001-04-0000_O-7" Name="Schalten 1" Text="Schalten 1" Number="7" FunctionText="Schalten" ObjectSize="1 Bit" ReadFlag="Enabled" WriteFlag="Disabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" UpdateFlag="Disabled" ReadOnInitFlag="Disabled" />
-							<ComObject Id="M-00FA_A-0001-04-0000_O-8" Name="Sperre Schalten 1" Text="Sperre Schalten 1" Number="8" FunctionText="Sperren" ObjectSize="1 Bit" ReadFlag="Enabled" WriteFlag="Enabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" UpdateFlag="Enabled" ReadOnInitFlag="Disabled" />
-							<ComObject Id="M-00FA_A-0001-04-0000_O-9" Name="Limit Setzten 1" Text="Limit Setzten 1" Number="9" FunctionText="Prozent Setzen" ObjectSize="1 Byte" ReadFlag="Enabled" WriteFlag="Enabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" UpdateFlag="Enabled" ReadOnInitFlag="Disabled" />
-							<ComObject Id="M-00FA_A-0001-04-0000_O-10" Name="Untere Schwelle 1" Text="Untere Schwelle 1" Number="10" FunctionText="Untere Schwelle Setzen" ObjectSize="2 Bytes" ReadFlag="Enabled" WriteFlag="Enabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" UpdateFlag="Enabled" ReadOnInitFlag="Disabled" />
-							<ComObject Id="M-00FA_A-0001-04-0000_O-11" Name="Obere Schwelle 1" Text="Obere Schwelle 1" Number="11" FunctionText="Obere Schwelle Setzten" ObjectSize="2 Bytes" ReadFlag="Enabled" WriteFlag="Enabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" UpdateFlag="Enabled" ReadOnInitFlag="Disabled" />
-							<ComObject Id="M-00FA_A-0001-04-0000_O-12" Name="Fehler Druck 2" Text="Fehler Druck 2" Number="12" FunctionText="Melden" ObjectSize="1 Bit" ReadFlag="Enabled" WriteFlag="Disabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" UpdateFlag="Disabled" ReadOnInitFlag="Disabled" />
-							<ComObject Id="M-00FA_A-0001-04-0000_O-13" Name="Druck RAW 2" Text="Druck RAW 2" Number="13" FunctionText="Druck Senden" ObjectSize="2 Bytes" ReadFlag="Enabled" WriteFlag="Disabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" UpdateFlag="Disabled" ReadOnInitFlag="Disabled" />
-							<ComObject Id="M-00FA_A-0001-04-0000_O-14" Name="Druck Prozent 2" Text="Druck Prozent 2" Number="14" FunctionText="Druck Senden" ObjectSize="1 Byte" ReadFlag="Enabled" WriteFlag="Disabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" UpdateFlag="Disabled" ReadOnInitFlag="Disabled" />
-							<ComObject Id="M-00FA_A-0001-04-0000_O-15" Name="Schalten 2" Text="Schalten 2" Number="15" FunctionText="Schalten" ObjectSize="1 Bit" ReadFlag="Enabled" WriteFlag="Disabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" UpdateFlag="Disabled" ReadOnInitFlag="Disabled" />
-							<ComObject Id="M-00FA_A-0001-04-0000_O-16" Name="Sperre Schalten 2" Text="Sperre Schalten 2" Number="16" FunctionText="Sperren" ObjectSize="1 Bit" ReadFlag="Enabled" WriteFlag="Enabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" UpdateFlag="Enabled" ReadOnInitFlag="Disabled" />
-							<ComObject Id="M-00FA_A-0001-04-0000_O-17" Name="Limit Setzten 2" Text="Limit Setzten 2" Number="17" FunctionText="Prozent Setzen" ObjectSize="1 Byte" ReadFlag="Enabled" WriteFlag="Enabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" UpdateFlag="Enabled" ReadOnInitFlag="Disabled" />
-							<ComObject Id="M-00FA_A-0001-04-0000_O-18" Name="Untere Schwelle 2" Text="Untere Schwelle 2" Number="18" FunctionText="Untere Schwelle Setzen" ObjectSize="2 Bytes" ReadFlag="Enabled" WriteFlag="Enabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" UpdateFlag="Enabled" ReadOnInitFlag="Disabled" />
-							<ComObject Id="M-00FA_A-0001-04-0000_O-19" Name="Obere Schwelle 2" Text="Obere Schwelle 2" Number="19" FunctionText="Obere Schwelle Setzen" ObjectSize="2 Bytes" ReadFlag="Enabled" WriteFlag="Enabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" UpdateFlag="Enabled" ReadOnInitFlag="Disabled" />
-							<ComObject Id="M-00FA_A-0001-04-0000_O-20" Name="Fehler Druck Summe" Text="Fehler Druck Summe" Number="20" FunctionText="Melden" ObjectSize="1 Bit" ReadFlag="Enabled" WriteFlag="Disabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" UpdateFlag="Disabled" ReadOnInitFlag="Disabled" />
-							<ComObject Id="M-00FA_A-0001-04-0000_O-21" Name="Druck RAW Summe" Text="Druck RAW Summe" Number="21" FunctionText="Druck Senden" ObjectSize="2 Bytes" ReadFlag="Enabled" WriteFlag="Disabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" UpdateFlag="Disabled" ReadOnInitFlag="Disabled" />
-							<ComObject Id="M-00FA_A-0001-04-0000_O-22" Name="Druck Prozent Summe" Text="Druck Prozent Summe" Number="22" FunctionText="Druck Senden" ObjectSize="1 Byte" ReadFlag="Enabled" WriteFlag="Disabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" UpdateFlag="Disabled" ReadOnInitFlag="Disabled" />
-							<ComObject Id="M-00FA_A-0001-04-0000_O-23" Name="Schalten Summe" Text="Schalten Summe" Number="23" FunctionText="Schalten" ObjectSize="1 Bit" ReadFlag="Enabled" WriteFlag="Disabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" UpdateFlag="Disabled" ReadOnInitFlag="Disabled" />
-							<ComObject Id="M-00FA_A-0001-04-0000_O-24" Name="Sperre Schalten Summe" Text="Sperre Schalten Summe" Number="24" FunctionText="Sperren" ObjectSize="1 Bit" ReadFlag="Enabled" WriteFlag="Enabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" UpdateFlag="Enabled" ReadOnInitFlag="Disabled" />
-							<ComObject Id="M-00FA_A-0001-04-0000_O-25" Name="Limit Setzten Summe" Text="Limit Setzten Summe" Number="25" FunctionText="Prozent Setzten" ObjectSize="1 Byte" ReadFlag="Enabled" WriteFlag="Enabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" UpdateFlag="Enabled" ReadOnInitFlag="Disabled" />
-							<ComObject Id="M-00FA_A-0001-04-0000_O-26" Name="Schalten Beliebiger Druck" Text="Schalten Beliebiger Druck" Number="26" FunctionText="Schalten" ObjectSize="1 Bit" ReadFlag="Enabled" WriteFlag="Disabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" UpdateFlag="Disabled" ReadOnInitFlag="Disabled" />
-							<ComObject Id="M-00FA_A-0001-04-0000_O-27" Name="Sperre Schalten Beliebiger Druck" Text="Sperre Schalten Beliebiger Druck" Number="27" FunctionText="Sperren" ObjectSize="1 Bit" ReadFlag="Enabled" WriteFlag="Enabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" UpdateFlag="Enabled" ReadOnInitFlag="Disabled" />
+							<ComObject Id="M-00FA_A-0001-06-0000_O-1" Name="Lebenszeichenzähler" Text="Lebenszeichenzähler" Number="1" FunctionText="In Betrieb zählen" ObjectSize="2 Bytes" ReadFlag="Enabled" WriteFlag="Disabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" UpdateFlag="Disabled" ReadOnInitFlag="Disabled" />
+							<ComObject Id="M-00FA_A-0001-06-0000_O-2" Name="Lebenszeichen" Text="Lebenszeichen" Number="2" FunctionText="In Betrieb" ObjectSize="1 Bit" ReadFlag="Enabled" WriteFlag="Disabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" UpdateFlag="Disabled" ReadOnInitFlag="Disabled" />
+							<ComObject Id="M-00FA_A-0001-06-0000_O-3" Name="Diagnose" Text="Diagnose" Number="3" FunctionText="Aktivieren" ObjectSize="1 Bit" ReadFlag="Enabled" WriteFlag="Enabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" UpdateFlag="Enabled" ReadOnInitFlag="Disabled" />
+							<ComObject Id="M-00FA_A-0001-06-0000_O-4" Name="Fehler Druck 1" Text="Fehler Druck 1" Number="4" FunctionText="Melden" ObjectSize="1 Bit" ReadFlag="Enabled" WriteFlag="Disabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" UpdateFlag="Disabled" ReadOnInitFlag="Disabled" />
+							<ComObject Id="M-00FA_A-0001-06-0000_O-5" Name="Druck RAW 1" Text="Druck RAW 1" Number="5" FunctionText="Druck Senden" ObjectSize="2 Bytes" ReadFlag="Enabled" WriteFlag="Disabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" UpdateFlag="Disabled" ReadOnInitFlag="Disabled" />
+							<ComObject Id="M-00FA_A-0001-06-0000_O-6" Name="Druck Prozent 1" Text="Druck Prozent 1" Number="6" FunctionText="Druck Senden" ObjectSize="1 Byte" ReadFlag="Enabled" WriteFlag="Disabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" UpdateFlag="Disabled" ReadOnInitFlag="Disabled" />
+							<ComObject Id="M-00FA_A-0001-06-0000_O-7" Name="Schalten 1" Text="Schalten 1" Number="7" FunctionText="Schalten" ObjectSize="1 Bit" ReadFlag="Enabled" WriteFlag="Disabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" UpdateFlag="Disabled" ReadOnInitFlag="Disabled" />
+							<ComObject Id="M-00FA_A-0001-06-0000_O-8" Name="Sperre Schalten 1" Text="Sperre Schalten 1" Number="8" FunctionText="Sperren" ObjectSize="1 Bit" ReadFlag="Enabled" WriteFlag="Enabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" UpdateFlag="Enabled" ReadOnInitFlag="Disabled" />
+							<ComObject Id="M-00FA_A-0001-06-0000_O-9" Name="Schalten (Verzögert Aus) 1" Text="Schalten (Verzögert Aus) 1" Number="9" FunctionText="Schalten" ObjectSize="1 Bit" ReadFlag="Enabled" WriteFlag="Disabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" UpdateFlag="Disabled" ReadOnInitFlag="Disabled" />
+							<ComObject Id="M-00FA_A-0001-06-0000_O-10" Name="Limit Setzten 1" Text="Limit Setzten 1" Number="10" FunctionText="Prozent Setzen" ObjectSize="1 Byte" ReadFlag="Enabled" WriteFlag="Enabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" UpdateFlag="Enabled" ReadOnInitFlag="Disabled" />
+							<ComObject Id="M-00FA_A-0001-06-0000_O-11" Name="Untere Schwelle 1" Text="Untere Schwelle 1" Number="11" FunctionText="Untere Schwelle Setzen" ObjectSize="2 Bytes" ReadFlag="Enabled" WriteFlag="Enabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" UpdateFlag="Enabled" ReadOnInitFlag="Disabled" />
+							<ComObject Id="M-00FA_A-0001-06-0000_O-12" Name="Obere Schwelle 1" Text="Obere Schwelle 1" Number="12" FunctionText="Obere Schwelle Setzten" ObjectSize="2 Bytes" ReadFlag="Enabled" WriteFlag="Enabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" UpdateFlag="Enabled" ReadOnInitFlag="Disabled" />
+							<ComObject Id="M-00FA_A-0001-06-0000_O-13" Name="Fehler Druck 2" Text="Fehler Druck 2" Number="13" FunctionText="Melden" ObjectSize="1 Bit" ReadFlag="Enabled" WriteFlag="Disabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" UpdateFlag="Disabled" ReadOnInitFlag="Disabled" />
+							<ComObject Id="M-00FA_A-0001-06-0000_O-14" Name="Druck RAW 2" Text="Druck RAW 2" Number="14" FunctionText="Druck Senden" ObjectSize="2 Bytes" ReadFlag="Enabled" WriteFlag="Disabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" UpdateFlag="Disabled" ReadOnInitFlag="Disabled" />
+							<ComObject Id="M-00FA_A-0001-06-0000_O-15" Name="Druck Prozent 2" Text="Druck Prozent 2" Number="15" FunctionText="Druck Senden" ObjectSize="1 Byte" ReadFlag="Enabled" WriteFlag="Disabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" UpdateFlag="Disabled" ReadOnInitFlag="Disabled" />
+							<ComObject Id="M-00FA_A-0001-06-0000_O-16" Name="Schalten 2" Text="Schalten 2" Number="16" FunctionText="Schalten" ObjectSize="1 Bit" ReadFlag="Enabled" WriteFlag="Disabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" UpdateFlag="Disabled" ReadOnInitFlag="Disabled" />
+							<ComObject Id="M-00FA_A-0001-06-0000_O-17" Name="Sperre Schalten 2" Text="Sperre Schalten 2" Number="17" FunctionText="Sperren" ObjectSize="1 Bit" ReadFlag="Enabled" WriteFlag="Enabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" UpdateFlag="Enabled" ReadOnInitFlag="Disabled" />
+							<ComObject Id="M-00FA_A-0001-06-0000_O-18" Name="Schalten (Verzögert Aus) 2" Text="Schalten (Verzögert Aus) 2" Number="18" FunctionText="Schalten" ObjectSize="1 Bit" ReadFlag="Enabled" WriteFlag="Disabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" UpdateFlag="Disabled" ReadOnInitFlag="Disabled" />
+							<ComObject Id="M-00FA_A-0001-06-0000_O-19" Name="Limit Setzten 2" Text="Limit Setzten 2" Number="19" FunctionText="Prozent Setzen" ObjectSize="1 Byte" ReadFlag="Enabled" WriteFlag="Enabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" UpdateFlag="Enabled" ReadOnInitFlag="Disabled" />
+							<ComObject Id="M-00FA_A-0001-06-0000_O-20" Name="Untere Schwelle 2" Text="Untere Schwelle 2" Number="20" FunctionText="Untere Schwelle Setzen" ObjectSize="2 Bytes" ReadFlag="Enabled" WriteFlag="Enabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" UpdateFlag="Enabled" ReadOnInitFlag="Disabled" />
+							<ComObject Id="M-00FA_A-0001-06-0000_O-21" Name="Obere Schwelle 2" Text="Obere Schwelle 2" Number="21" FunctionText="Obere Schwelle Setzen" ObjectSize="2 Bytes" ReadFlag="Enabled" WriteFlag="Enabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" UpdateFlag="Enabled" ReadOnInitFlag="Disabled" />
+							<ComObject Id="M-00FA_A-0001-06-0000_O-22" Name="Fehler Druck Summe" Text="Fehler Druck Summe" Number="22" FunctionText="Melden" ObjectSize="1 Bit" ReadFlag="Enabled" WriteFlag="Disabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" UpdateFlag="Disabled" ReadOnInitFlag="Disabled" />
+							<ComObject Id="M-00FA_A-0001-06-0000_O-23" Name="Druck RAW Summe" Text="Druck RAW Summe" Number="23" FunctionText="Druck Senden" ObjectSize="2 Bytes" ReadFlag="Enabled" WriteFlag="Disabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" UpdateFlag="Disabled" ReadOnInitFlag="Disabled" />
+							<ComObject Id="M-00FA_A-0001-06-0000_O-24" Name="Druck Prozent Summe" Text="Druck Prozent Summe" Number="24" FunctionText="Druck Senden" ObjectSize="1 Byte" ReadFlag="Enabled" WriteFlag="Disabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" UpdateFlag="Disabled" ReadOnInitFlag="Disabled" />
+							<ComObject Id="M-00FA_A-0001-06-0000_O-25" Name="Schalten Summe" Text="Schalten Summe" Number="25" FunctionText="Schalten" ObjectSize="1 Bit" ReadFlag="Enabled" WriteFlag="Disabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" UpdateFlag="Disabled" ReadOnInitFlag="Disabled" />
+							<ComObject Id="M-00FA_A-0001-06-0000_O-26" Name="Sperre Schalten Summe" Text="Sperre Schalten Summe" Number="26" FunctionText="Sperren" ObjectSize="1 Bit" ReadFlag="Enabled" WriteFlag="Enabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" UpdateFlag="Enabled" ReadOnInitFlag="Disabled" />
+							<ComObject Id="M-00FA_A-0001-06-0000_O-27" Name="Schalten (Verzögert Aus) Summe" Text="Schalten (Verzögert Aus) Summe" Number="27" FunctionText="Schalten" ObjectSize="1 Bit" ReadFlag="Enabled" WriteFlag="Disabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" UpdateFlag="Disabled" ReadOnInitFlag="Disabled" />
+							<ComObject Id="M-00FA_A-0001-06-0000_O-28" Name="Limit Setzten Summe" Text="Limit Setzten Summe" Number="28" FunctionText="Prozent Setzten" ObjectSize="1 Byte" ReadFlag="Enabled" WriteFlag="Enabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" UpdateFlag="Enabled" ReadOnInitFlag="Disabled" />
+							<ComObject Id="M-00FA_A-0001-06-0000_O-29" Name="Schalten Beliebiger Druck" Text="Schalten Beliebiger Druck" Number="29" FunctionText="Schalten" ObjectSize="1 Bit" ReadFlag="Enabled" WriteFlag="Disabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" UpdateFlag="Disabled" ReadOnInitFlag="Disabled" />
+							<ComObject Id="M-00FA_A-0001-06-0000_O-30" Name="Sperre Schalten Beliebiger Druck" Text="Sperre Schalten Beliebiger Druck" Number="30" FunctionText="Sperren" ObjectSize="1 Bit" ReadFlag="Enabled" WriteFlag="Enabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" UpdateFlag="Enabled" ReadOnInitFlag="Disabled" />
+							<ComObject Id="M-00FA_A-0001-06-0000_O-31" Name="Schalten (Verzögert Aus) Beliebiger Druck" Text="Schalten (Verzögert Aus) Beliebiger Druck" Number="31" FunctionText="Schalten" ObjectSize="1 Bit" ReadFlag="Enabled" WriteFlag="Disabled" CommunicationFlag="Enabled" TransmitFlag="Enabled" UpdateFlag="Disabled" ReadOnInitFlag="Disabled" />
 						</ComObjectTable>
 						<ComObjectRefs>
-							<ComObjectRef Id="M-00FA_A-0001-04-0000_O-1_R-1" RefId="M-00FA_A-0001-04-0000_O-1" />
-							<ComObjectRef Id="M-00FA_A-0001-04-0000_O-2_R-2" RefId="M-00FA_A-0001-04-0000_O-2" />
-							<ComObjectRef Id="M-00FA_A-0001-04-0000_O-3_R-3" RefId="M-00FA_A-0001-04-0000_O-3" />
-							<ComObjectRef Id="M-00FA_A-0001-04-0000_O-4_R-4" RefId="M-00FA_A-0001-04-0000_O-4" />
-							<ComObjectRef Id="M-00FA_A-0001-04-0000_O-5_R-5" RefId="M-00FA_A-0001-04-0000_O-5" />
-							<ComObjectRef Id="M-00FA_A-0001-04-0000_O-6_R-6" RefId="M-00FA_A-0001-04-0000_O-6" />
-							<ComObjectRef Id="M-00FA_A-0001-04-0000_O-7_R-7" RefId="M-00FA_A-0001-04-0000_O-7" />
-							<ComObjectRef Id="M-00FA_A-0001-04-0000_O-8_R-8" RefId="M-00FA_A-0001-04-0000_O-8" />
-							<ComObjectRef Id="M-00FA_A-0001-04-0000_O-9_R-9" RefId="M-00FA_A-0001-04-0000_O-9" />
-							<ComObjectRef Id="M-00FA_A-0001-04-0000_O-10_R-10" RefId="M-00FA_A-0001-04-0000_O-10" />
-							<ComObjectRef Id="M-00FA_A-0001-04-0000_O-11_R-11" RefId="M-00FA_A-0001-04-0000_O-11" />
-							<ComObjectRef Id="M-00FA_A-0001-04-0000_O-12_R-12" RefId="M-00FA_A-0001-04-0000_O-12" />
-							<ComObjectRef Id="M-00FA_A-0001-04-0000_O-13_R-13" RefId="M-00FA_A-0001-04-0000_O-13" />
-							<ComObjectRef Id="M-00FA_A-0001-04-0000_O-14_R-14" RefId="M-00FA_A-0001-04-0000_O-14" />
-							<ComObjectRef Id="M-00FA_A-0001-04-0000_O-15_R-15" RefId="M-00FA_A-0001-04-0000_O-15" />
-							<ComObjectRef Id="M-00FA_A-0001-04-0000_O-16_R-16" RefId="M-00FA_A-0001-04-0000_O-16" />
-							<ComObjectRef Id="M-00FA_A-0001-04-0000_O-17_R-17" RefId="M-00FA_A-0001-04-0000_O-17" />
-							<ComObjectRef Id="M-00FA_A-0001-04-0000_O-18_R-18" RefId="M-00FA_A-0001-04-0000_O-18" />
-							<ComObjectRef Id="M-00FA_A-0001-04-0000_O-19_R-19" RefId="M-00FA_A-0001-04-0000_O-19" />
-							<ComObjectRef Id="M-00FA_A-0001-04-0000_O-20_R-20" RefId="M-00FA_A-0001-04-0000_O-20" />
-							<ComObjectRef Id="M-00FA_A-0001-04-0000_O-21_R-21" RefId="M-00FA_A-0001-04-0000_O-21" />
-							<ComObjectRef Id="M-00FA_A-0001-04-0000_O-22_R-22" RefId="M-00FA_A-0001-04-0000_O-22" />
-							<ComObjectRef Id="M-00FA_A-0001-04-0000_O-23_R-23" RefId="M-00FA_A-0001-04-0000_O-23" />
-							<ComObjectRef Id="M-00FA_A-0001-04-0000_O-24_R-24" RefId="M-00FA_A-0001-04-0000_O-24" />
-							<ComObjectRef Id="M-00FA_A-0001-04-0000_O-25_R-25" RefId="M-00FA_A-0001-04-0000_O-25" />
-							<ComObjectRef Id="M-00FA_A-0001-04-0000_O-26_R-26" RefId="M-00FA_A-0001-04-0000_O-26" />
-							<ComObjectRef Id="M-00FA_A-0001-04-0000_O-27_R-27" RefId="M-00FA_A-0001-04-0000_O-27" />
+							<ComObjectRef Id="M-00FA_A-0001-06-0000_O-1_R-1" RefId="M-00FA_A-0001-06-0000_O-1" />
+							<ComObjectRef Id="M-00FA_A-0001-06-0000_O-2_R-2" RefId="M-00FA_A-0001-06-0000_O-2" />
+							<ComObjectRef Id="M-00FA_A-0001-06-0000_O-3_R-3" RefId="M-00FA_A-0001-06-0000_O-3" />
+							<ComObjectRef Id="M-00FA_A-0001-06-0000_O-4_R-4" RefId="M-00FA_A-0001-06-0000_O-4" />
+							<ComObjectRef Id="M-00FA_A-0001-06-0000_O-5_R-5" RefId="M-00FA_A-0001-06-0000_O-5" />
+							<ComObjectRef Id="M-00FA_A-0001-06-0000_O-6_R-6" RefId="M-00FA_A-0001-06-0000_O-6" />
+							<ComObjectRef Id="M-00FA_A-0001-06-0000_O-7_R-7" RefId="M-00FA_A-0001-06-0000_O-7" />
+							<ComObjectRef Id="M-00FA_A-0001-06-0000_O-8_R-8" RefId="M-00FA_A-0001-06-0000_O-8" />
+							<ComObjectRef Id="M-00FA_A-0001-06-0000_O-9_R-9" RefId="M-00FA_A-0001-06-0000_O-9" />
+							<ComObjectRef Id="M-00FA_A-0001-06-0000_O-10_R-10" RefId="M-00FA_A-0001-06-0000_O-10" />
+							<ComObjectRef Id="M-00FA_A-0001-06-0000_O-11_R-11" RefId="M-00FA_A-0001-06-0000_O-11" />
+							<ComObjectRef Id="M-00FA_A-0001-06-0000_O-12_R-12" RefId="M-00FA_A-0001-06-0000_O-12" />
+							<ComObjectRef Id="M-00FA_A-0001-06-0000_O-13_R-13" RefId="M-00FA_A-0001-06-0000_O-13" />
+							<ComObjectRef Id="M-00FA_A-0001-06-0000_O-14_R-14" RefId="M-00FA_A-0001-06-0000_O-14" />
+							<ComObjectRef Id="M-00FA_A-0001-06-0000_O-15_R-15" RefId="M-00FA_A-0001-06-0000_O-15" />
+							<ComObjectRef Id="M-00FA_A-0001-06-0000_O-16_R-16" RefId="M-00FA_A-0001-06-0000_O-16" />
+							<ComObjectRef Id="M-00FA_A-0001-06-0000_O-17_R-17" RefId="M-00FA_A-0001-06-0000_O-17" />
+							<ComObjectRef Id="M-00FA_A-0001-06-0000_O-18_R-18" RefId="M-00FA_A-0001-06-0000_O-18" />
+							<ComObjectRef Id="M-00FA_A-0001-06-0000_O-19_R-19" RefId="M-00FA_A-0001-06-0000_O-19" />
+							<ComObjectRef Id="M-00FA_A-0001-06-0000_O-20_R-20" RefId="M-00FA_A-0001-06-0000_O-20" />
+							<ComObjectRef Id="M-00FA_A-0001-06-0000_O-21_R-21" RefId="M-00FA_A-0001-06-0000_O-21" />
+							<ComObjectRef Id="M-00FA_A-0001-06-0000_O-22_R-22" RefId="M-00FA_A-0001-06-0000_O-22" />
+							<ComObjectRef Id="M-00FA_A-0001-06-0000_O-23_R-23" RefId="M-00FA_A-0001-06-0000_O-23" />
+							<ComObjectRef Id="M-00FA_A-0001-06-0000_O-24_R-24" RefId="M-00FA_A-0001-06-0000_O-24" />
+							<ComObjectRef Id="M-00FA_A-0001-06-0000_O-25_R-25" RefId="M-00FA_A-0001-06-0000_O-25" />
+							<ComObjectRef Id="M-00FA_A-0001-06-0000_O-26_R-26" RefId="M-00FA_A-0001-06-0000_O-26" />
+							<ComObjectRef Id="M-00FA_A-0001-06-0000_O-27_R-27" RefId="M-00FA_A-0001-06-0000_O-27" />
+							<ComObjectRef Id="M-00FA_A-0001-06-0000_O-28_R-28" RefId="M-00FA_A-0001-06-0000_O-28" />
+							<ComObjectRef Id="M-00FA_A-0001-06-0000_O-29_R-29" RefId="M-00FA_A-0001-06-0000_O-29" />
+							<ComObjectRef Id="M-00FA_A-0001-06-0000_O-30_R-30" RefId="M-00FA_A-0001-06-0000_O-30" />
+							<ComObjectRef Id="M-00FA_A-0001-06-0000_O-31_R-31" RefId="M-00FA_A-0001-06-0000_O-31" />
 						</ComObjectRefs>
 						<AddressTable MaxEntries="65535" />
 						<AssociationTable MaxEntries="65535" />
 						<LoadProcedures>
 							<LoadProcedure MergeId="2">
-								<LdCtrlRelSegment AppliesTo="full" LsmIdx="4" Size="40" Mode="1" Fill="0" />
-								<LdCtrlRelSegment AppliesTo="par" LsmIdx="4" Size="40" Mode="0" Fill="0" />
+								<LdCtrlRelSegment AppliesTo="full" LsmIdx="4" Size="47" Mode="1" Fill="0" />
+								<LdCtrlRelSegment AppliesTo="par" LsmIdx="4" Size="47" Mode="0" Fill="0" />
 							</LoadProcedure>
 							<LoadProcedure MergeId="4">
-								<LdCtrlWriteRelMem AppliesTo="full,par" ObjIdx="4" Offset="0" Size="40" Verify="true" />
+								<LdCtrlWriteRelMem AppliesTo="full,par" ObjIdx="4" Offset="0" Size="47" Verify="true" />
 							</LoadProcedure>
 							<LoadProcedure MergeId="7">
 								<LdCtrlLoadImageProp ObjIdx="4" PropId="27" />
@@ -169,53 +237,66 @@
 					</Static>
 					<Dynamic>
 						<ChannelIndependentBlock>
-							<ParameterBlock Id="M-00FA_A-0001-04-0000_PB-1" Name="General" Text="Allgemeine Parameter">
-								<ParameterRefRef RefId="M-00FA_A-0001-04-0000_P-1_R-1" />
-								<ParameterRefRef RefId="M-00FA_A-0001-04-0000_P-2_R-2" />
-								<ParameterRefRef RefId="M-00FA_A-0001-04-0000_P-3_R-3" />
-								<ComObjectRefRef RefId="M-00FA_A-0001-04-0000_O-1_R-1" />
-								<ComObjectRefRef RefId="M-00FA_A-0001-04-0000_O-2_R-2" />
-								<ComObjectRefRef RefId="M-00FA_A-0001-04-0000_O-3_R-3" />
-								<ComObjectRefRef RefId="M-00FA_A-0001-04-0000_O-4_R-4" />
-								<ComObjectRefRef RefId="M-00FA_A-0001-04-0000_O-5_R-5" />
-								<ComObjectRefRef RefId="M-00FA_A-0001-04-0000_O-6_R-6" />
-								<ComObjectRefRef RefId="M-00FA_A-0001-04-0000_O-7_R-7" />
-								<ComObjectRefRef RefId="M-00FA_A-0001-04-0000_O-8_R-8" />
-								<ComObjectRefRef RefId="M-00FA_A-0001-04-0000_O-9_R-9" />
-								<ComObjectRefRef RefId="M-00FA_A-0001-04-0000_O-10_R-10" />
-								<ComObjectRefRef RefId="M-00FA_A-0001-04-0000_O-11_R-11" />
-								<ComObjectRefRef RefId="M-00FA_A-0001-04-0000_O-12_R-12" />
-								<ComObjectRefRef RefId="M-00FA_A-0001-04-0000_O-13_R-13" />
-								<ComObjectRefRef RefId="M-00FA_A-0001-04-0000_O-14_R-14" />
-								<ComObjectRefRef RefId="M-00FA_A-0001-04-0000_O-15_R-15" />
-								<ComObjectRefRef RefId="M-00FA_A-0001-04-0000_O-16_R-16" />
-								<ComObjectRefRef RefId="M-00FA_A-0001-04-0000_O-17_R-17" />
-								<ComObjectRefRef RefId="M-00FA_A-0001-04-0000_O-18_R-18" />
-								<ComObjectRefRef RefId="M-00FA_A-0001-04-0000_O-19_R-19" />
-								<ComObjectRefRef RefId="M-00FA_A-0001-04-0000_O-20_R-20" />
-								<ComObjectRefRef RefId="M-00FA_A-0001-04-0000_O-21_R-21" />
-								<ComObjectRefRef RefId="M-00FA_A-0001-04-0000_O-22_R-22" />
-								<ComObjectRefRef RefId="M-00FA_A-0001-04-0000_O-23_R-23" />
-								<ComObjectRefRef RefId="M-00FA_A-0001-04-0000_O-24_R-24" />
-								<ComObjectRefRef RefId="M-00FA_A-0001-04-0000_O-25_R-25" />
-								<ComObjectRefRef RefId="M-00FA_A-0001-04-0000_O-26_R-26" />
-								<ComObjectRefRef RefId="M-00FA_A-0001-04-0000_O-27_R-27" />
+							<ParameterBlock Id="M-00FA_A-0001-06-0000_PB-1" Name="General" Text="Allgemeine Parameter">
+								<ParameterRefRef RefId="M-00FA_A-0001-06-0000_P-1_R-1" />
+								<ParameterRefRef RefId="M-00FA_A-0001-06-0000_P-2_R-2" />
+								<ParameterRefRef RefId="M-00FA_A-0001-06-0000_P-3_R-3" />
+								<ComObjectRefRef RefId="M-00FA_A-0001-06-0000_O-1_R-1" />
+								<ComObjectRefRef RefId="M-00FA_A-0001-06-0000_O-2_R-2" />
+								<ComObjectRefRef RefId="M-00FA_A-0001-06-0000_O-3_R-3" />
+								<ComObjectRefRef RefId="M-00FA_A-0001-06-0000_O-4_R-4" />
+								<ComObjectRefRef RefId="M-00FA_A-0001-06-0000_O-5_R-5" />
+								<ComObjectRefRef RefId="M-00FA_A-0001-06-0000_O-6_R-6" />
+								<ComObjectRefRef RefId="M-00FA_A-0001-06-0000_O-7_R-7" />
+								<ComObjectRefRef RefId="M-00FA_A-0001-06-0000_O-8_R-8" />
+								<ComObjectRefRef RefId="M-00FA_A-0001-06-0000_O-9_R-9" />
+								<ComObjectRefRef RefId="M-00FA_A-0001-06-0000_O-10_R-10" />
+								<ComObjectRefRef RefId="M-00FA_A-0001-06-0000_O-11_R-11" />
+								<ComObjectRefRef RefId="M-00FA_A-0001-06-0000_O-12_R-12" />
+								<ComObjectRefRef RefId="M-00FA_A-0001-06-0000_O-13_R-13" />
+								<ComObjectRefRef RefId="M-00FA_A-0001-06-0000_O-14_R-14" />
+								<ComObjectRefRef RefId="M-00FA_A-0001-06-0000_O-15_R-15" />
+								<ComObjectRefRef RefId="M-00FA_A-0001-06-0000_O-16_R-16" />
+								<ComObjectRefRef RefId="M-00FA_A-0001-06-0000_O-17_R-17" />
+								<ComObjectRefRef RefId="M-00FA_A-0001-06-0000_O-18_R-18" />
+								<ComObjectRefRef RefId="M-00FA_A-0001-06-0000_O-19_R-19" />
+								<ComObjectRefRef RefId="M-00FA_A-0001-06-0000_O-20_R-20" />
+								<ComObjectRefRef RefId="M-00FA_A-0001-06-0000_O-21_R-21" />
+								<ComObjectRefRef RefId="M-00FA_A-0001-06-0000_O-22_R-22" />
+								<ComObjectRefRef RefId="M-00FA_A-0001-06-0000_O-23_R-23" />
+								<ComObjectRefRef RefId="M-00FA_A-0001-06-0000_O-24_R-24" />
+								<ComObjectRefRef RefId="M-00FA_A-0001-06-0000_O-25_R-25" />
+								<ComObjectRefRef RefId="M-00FA_A-0001-06-0000_O-26_R-26" />
+								<ComObjectRefRef RefId="M-00FA_A-0001-06-0000_O-27_R-27" />
+								<ComObjectRefRef RefId="M-00FA_A-0001-06-0000_O-28_R-28" />
+								<ComObjectRefRef RefId="M-00FA_A-0001-06-0000_O-29_R-29" />
+								<ComObjectRefRef RefId="M-00FA_A-0001-06-0000_O-30_R-30" />
+								<ComObjectRefRef RefId="M-00FA_A-0001-06-0000_O-31_R-31" />
 							</ParameterBlock>
-							<ParameterBlock Id="M-00FA_A-0001-04-0000_PB-2" Name="Druckmesser1" Text="Druckmesser 1">
-								<ParameterRefRef RefId="M-00FA_A-0001-04-0000_P-4_R-4" />
-								<ParameterRefRef RefId="M-00FA_A-0001-04-0000_P-5_R-5" />
-								<ParameterRefRef RefId="M-00FA_A-0001-04-0000_P-6_R-6" />
+							<ParameterBlock Id="M-00FA_A-0001-06-0000_PB-2" Name="Druckmesser1" Text="Druckmesser 1">
+								<ParameterRefRef RefId="M-00FA_A-0001-06-0000_P-4_R-4" />
+								<ParameterRefRef RefId="M-00FA_A-0001-06-0000_P-5_R-5" />
+								<ParameterRefRef RefId="M-00FA_A-0001-06-0000_P-6_R-6" />
+								<ParameterRefRef RefId="M-00FA_A-0001-06-0000_P-7_R-7" />
+								<ParameterRefRef RefId="M-00FA_A-0001-06-0000_P-8_R-8" />
 							</ParameterBlock>
-							<ParameterBlock Id="M-00FA_A-0001-04-0000_PB-3" Name="Druckmesser2" Text="Druckmesser 2">
-								<ParameterRefRef RefId="M-00FA_A-0001-04-0000_P-7_R-7" />
-								<ParameterRefRef RefId="M-00FA_A-0001-04-0000_P-8_R-8" />
-								<ParameterRefRef RefId="M-00FA_A-0001-04-0000_P-9_R-9" />
+							<ParameterBlock Id="M-00FA_A-0001-06-0000_PB-3" Name="Druckmesser2" Text="Druckmesser 2">
+								<ParameterRefRef RefId="M-00FA_A-0001-06-0000_P-9_R-9" />
+								<ParameterRefRef RefId="M-00FA_A-0001-06-0000_P-10_R-10" />
+								<ParameterRefRef RefId="M-00FA_A-0001-06-0000_P-11_R-11" />
+								<ParameterRefRef RefId="M-00FA_A-0001-06-0000_P-12_R-12" />
+								<ParameterRefRef RefId="M-00FA_A-0001-06-0000_P-13_R-13" />
 							</ParameterBlock>
-							<ParameterBlock Id="M-00FA_A-0001-04-0000_PB-4" Name="DruckmesserSum" Text="Druckmesser Summe">
-								<ParameterRefRef RefId="M-00FA_A-0001-04-0000_P-10_R-10" />
-								<ParameterRefRef RefId="M-00FA_A-0001-04-0000_P-11_R-11" />
-								<ParameterRefRef RefId="M-00FA_A-0001-04-0000_P-12_R-12" />
-								<ParameterRefRef RefId="M-00FA_A-0001-04-0000_P-13_R-13" />
+							<ParameterBlock Id="M-00FA_A-0001-06-0000_PB-4" Name="DruckmesserSum" Text="Druckmesser Summe">
+								<ParameterRefRef RefId="M-00FA_A-0001-06-0000_P-14_R-14" />
+								<ParameterRefRef RefId="M-00FA_A-0001-06-0000_P-15_R-15" />
+								<ParameterRefRef RefId="M-00FA_A-0001-06-0000_P-16_R-16" />
+								<ParameterRefRef RefId="M-00FA_A-0001-06-0000_P-17_R-17" />
+								<ParameterRefRef RefId="M-00FA_A-0001-06-0000_P-18_R-18" />
+							</ParameterBlock>
+							<ParameterBlock Id="M-00FA_A-0001-06-0000_PB-5" Name="BeliebigerDruck" Text="Beliebiger Druck">
+								<ParameterRefRef RefId="M-00FA_A-0001-06-0000_P-19_R-19" />
+								<ParameterRefRef RefId="M-00FA_A-0001-06-0000_P-20_R-20" />
 							</ParameterBlock>
 						</ChannelIndependentBlock>
 					</Dynamic>
@@ -229,9 +310,9 @@
 						</Product>
 					</Products>
 					<Hardware2Programs>
-						<Hardware2Program Id="M-00FA_H-1-1_HP-0001-04-0000" MediumTypes="MT-0">
-							<ApplicationProgramRef RefId="M-00FA_A-0001-04-0000" />
-							<RegistrationInfo RegistrationStatus="Registered" RegistrationNumber="0001/14" />
+						<Hardware2Program Id="M-00FA_H-1-1_HP-0001-06-0000" MediumTypes="MT-0">
+							<ApplicationProgramRef RefId="M-00FA_A-0001-06-0000" />
+							<RegistrationInfo RegistrationStatus="Registered" RegistrationNumber="0001/16" />
 						</Hardware2Program>
 					</Hardware2Programs>
 				</Hardware>

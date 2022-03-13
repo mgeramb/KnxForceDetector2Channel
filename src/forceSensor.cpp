@@ -10,10 +10,13 @@ ForceSensorBase::ForceSensorBase(const char *name, int &groupObjectIndex, uint32
       goForcePercentage(knx.getGroupObject(groupObjectIndex++)),
       goForceDetected(knx.getGroupObject(groupObjectIndex++)),
       goLockForceDetected(knx.getGroupObject(groupObjectIndex++)),
+      goSwitchDelayedOff(knx.getGroupObject(groupObjectIndex++)),
       goSetDetectionLimit(knx.getGroupObject(groupObjectIndex++)),
       hysterese(readKnxParameterUInt32(name, "Hysterese", parameterAddress)),
       percentChangeToSent((byte)readKnxParameterUInt32(name, "PercentChangeToSent", parameterAddress)),
-      lockModeForceDetected((LockMode)readKnxParameterUInt8(name, "LockModeForceDetected", parameterAddress))
+      errorMode((ErrorMode)readKnxParameterUInt8(name, "ErrorMode", parameterAddress)),
+      lockModeForceDetected((LockMode)readKnxParameterUInt8(name, "LockModeForceDetected", parameterAddress)),
+      delayedOffTime(getDelayedOffTime((DelayedSwitchOffTime)readKnxParameterUInt8(name, "SwitchOffTime", parameterAddress)))
 {
     Serial.println("initGroupObjects base");
     goErrorForce.dataPointType(DPT_Switch);
@@ -24,8 +27,59 @@ ForceSensorBase::ForceSensorBase(const char *name, int &groupObjectIndex, uint32
     goLockForceDetected.dataPointType(DPT_Enable);
     goSetDetectionLimit.callback(callback);
     goSetDetectionLimit.dataPointType(DPT_Scaling);
+    goSwitchDelayedOff.dataPointType(DPT_Switch);
+    goSwitchDelayedOff.callback(callback);
     if (percentChangeToSent < 1)
         percentChangeToSent = 1;
+}
+
+uint32_t ForceSensorBase::getDelayedOffTime(DelayedSwitchOffTime delayedOffTime)
+{
+    switch(delayedOffTime)
+    {
+        case OneSecond:
+            return 1000;
+        case TenSeconds:
+            return 1000 * 10;
+        case ThirtySeconds:
+            return 1000 * 30;
+        case OneMinute:
+            return 1000 * 60;
+        case TwoMinute:
+            return 1000 * 60 * 2;
+        case FiveMinutes:
+            return 1000 * 60 * 5;
+        case TenMinutes:
+            return 1000 * 60 * 10;
+        case FifteenMinutes:
+            return 1000 * 60 * 15;
+        case ThirtyMinutes:
+            return 1000 * 60 * 30;
+        case OneHour:
+            return 1000 * 3600;
+        case TwoHours:
+            return 1000 * 3600 * 2;
+        case TreeHours:
+            return 1000 * 3600 * 3;
+        case FourHours:
+            return 1000 * 3600 * 4;
+        case FiveHours:
+            return 1000 * 3600 * 5;
+        case SixHours:
+            return 1000 * 3600 * 6;
+        case SevenHours:
+            return 1000 * 3600 * 7;
+        case EightHours:
+            return 1000 * 3600 * 8;
+        case NineHours:
+            return 1000 * 3600 * 9;
+        case TenHours:
+            return 1000 * 3600 * 10;
+        case OnlySendOn:
+            return 0;
+        default:
+            return 0;
+        }
 }
 
 void ForceSensorBase::callback(GroupObject &groupObject)
@@ -85,30 +139,71 @@ void ForceSensorBase::loop(unsigned long now, bool diagnosticMode, bool forceSen
     if (raw < lowerLimit)
     {
         error = true;
-        detected = true;
+        switch (errorMode)
+        {
+            case ErrorMode::SwitchOff:
+                detected = false;
+                break;
+            case ErrorMode::SwitchOn:
+                detected = true;
+                break;
+            case ErrorMode::SwitchOffForUnderflowOnForOverflow:
+                detected = false;
+                break;
+            case ErrorMode::KeepLastValidState:
+                detected = lastForceDetected;
+                break;
+        }
         percent = 0;
     }
     else if (raw > upperLimit)
     {
         error = true;
-        detected = true;
+        switch (errorMode)
+        {
+            case ErrorMode::SwitchOff:
+                detected = false;
+                break;
+            case ErrorMode::SwitchOn:
+                detected = true;
+                break;
+            case ErrorMode::SwitchOffForUnderflowOnForOverflow:
+                detected = true;
+                break;
+            case ErrorMode::KeepLastValidState:
+                detected = lastForceDetected;
+                break;
+        }
         percent = 100;
     }
     else
     {
         float onePercent = ((float)(upperLimit - lowerLimit)) / (float)100;
+        if (onePercent == 0)
+            onePercent = 0.00001;
         percent = ((float)(raw - lowerLimit) / onePercent);
-        byte currentDetectionLimit = detectionLimit;
+        if (diagnosticMode)
+            logValue(name, "Detection Limit", detectionLimit);
+        float currentDetectionLimit = detectionLimit;
+        if (diagnosticMode)
+            logValue(name, "Current Detection Limit before", currentDetectionLimit);
+        if (diagnosticMode)
+            logValue(name, "Hysterese", (float) hysterese);
         if (lastForceDetected)
         {
             if (currentDetectionLimit > hysterese)
-                currentDetectionLimit = -hysterese;
+                currentDetectionLimit -= (float)hysterese;
             else 
                 currentDetectionLimit = 0;
         }
+        if (diagnosticMode)
+            logValue(name, "Current Detection Limit", currentDetectionLimit);
         if (percent >= currentDetectionLimit)
             detected = true;
     }
+    if (diagnosticMode)
+        logValue(name, "Percent", percent);
+  
     if (lockForceDetected)
     {
         switch (lockModeForceDetected)
@@ -152,6 +247,32 @@ void ForceSensorBase::loop(unsigned long now, bool diagnosticMode, bool forceSen
         lastForceDetected = detected;
         logValue(name, "Send force detected", lastForceDetected);
         goForceDetected.value(detected);
+        delayedOffTimer = now;
+    }
+    HandleDelayedOff("Send switchDelayedOff", now, forceSent, delayedOffTime, delayedOffTimer, lastSwitchDelayed, detected, goSwitchDelayedOff);
+}
+
+void ForceSensorBase::HandleDelayedOff(const char* operation, uint32_t now, bool forceSent, uint32_t delayedOffTime, uint32_t delayedOffTimer, bool& lastState, bool newState, GroupObject& go)
+{
+    if (!newState)
+    {
+        if (delayedOffTime > 0)
+        {
+            // handle delayed of
+            if (lastState && now - delayedOffTimer < delayedOffTime)
+            {
+                newState = true;
+            }
+        }
+    }
+    if (lastState != newState || forceSent)
+    {
+        lastState = newState;
+        if (delayedOffTime > 0 || newState)
+        {
+            logValue(name, operation, newState);
+            go.value(newState);
+        }
     }
 }
 
@@ -237,11 +358,16 @@ ForceSensorSum::ForceSensorSum(const char *name, int &groupObjectIndex, uint32_t
       sensorCount(sensorCount),
       goDetectedAny(knx.getGroupObject(groupObjectIndex++)),
       goLockDetectedAny(knx.getGroupObject(groupObjectIndex++)),
-      lockModeAnyDetected((LockMode)readKnxParameterUInt8(name, "LockModeDetected", parameterAddress))
+      goSwitchDelayedOffAny(knx.getGroupObject(groupObjectIndex++)),
+      lockModeAnyDetected((LockMode)readKnxParameterUInt8(name, "LockModeDetected", parameterAddress)),
+      delayedOffTimeAny(getDelayedOffTime((DelayedSwitchOffTime)readKnxParameterUInt8(name, "SwitchOffTimeAny", parameterAddress)))
+
 {
     goDetectedAny.dataPointType(DPT_Switch);
     goLockDetectedAny.callback(callback);
     goLockDetectedAny.dataPointType(DPT_Enable);
+    goSwitchDelayedOffAny.dataPointType(DPT_Switch);
+    goSwitchDelayedOffAny.callback(callback);
 }
 
 void ForceSensorSum::callback(GroupObject &groupObject)
@@ -314,8 +440,10 @@ void ForceSensorSum::loop(unsigned long now, bool diagnosticMode, bool forceSent
     {
         lastAnyDetected = anyDetected;
         logValue(name, "Send DetectedAny", lastAnyDetected);
-        goDetectedAny.value(lastRaw);
+        goDetectedAny.value(anyDetected);
+        delayedOffTimerAny = now;
     }
+    HandleDelayedOff("Send SwitchDelayedOffAny", now, forceSent, delayedOffTimeAny, delayedOffTimerAny, lastSwitchDelayedAny, anyDetected, goSwitchDelayedOffAny);
 }
 
 uint32_t ForceSensorSum::getLowerLimit()
