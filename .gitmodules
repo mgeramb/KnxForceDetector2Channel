@@ -1,0 +1,6 @@
+[submodule "lib/knx"]
+	path = lib/knx
+	url = https://github.com/thelsing/knx.git
+[submodule "lib/FlashStorage"]
+	path = lib/FlashStorage
+	url = https://github.com/thelsing/FlashStorage.git
