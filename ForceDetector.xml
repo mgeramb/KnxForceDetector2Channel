@@ -79,10 +79,10 @@
 							<Parameter Id="M-00FA_A-0001-06-0000_P-3" Name="Pollinginterval" ParameterType="M-00FA_A-0001-06-0000_PT-SensorPollingIntervallInMs" Text="Sensorabtastrate (Millisekunden)" Value="1000">
 								<Memory CodeSegment="M-00FA_A-0001-06-0000_RS-04-00000" Offset="8" BitOffset="0" />
 							</Parameter>
-							<Parameter Id="M-00FA_A-0001-06-0000_P-4" Name="Hystereses1" ParameterType="M-00FA_A-0001-06-0000_PT-Hystereses" Text="Hysterese (Prozent)" Value="5">
+							<Parameter Id="M-00FA_A-0001-06-0000_P-4" Name="Hystereses1" ParameterType="M-00FA_A-0001-06-0000_PT-Hystereses" Text="Hysterese (Prozent)" Value="2">
 								<Memory CodeSegment="M-00FA_A-0001-06-0000_RS-04-00000" Offset="12" BitOffset="0" />
 							</Parameter>
-							<Parameter Id="M-00FA_A-0001-06-0000_P-5" Name="PercentChangeToSent1" ParameterType="M-00FA_A-0001-06-0000_PT-PercentChangeToSent" Text="Prozentänderung senden bei (Prozent)" Value="5">
+							<Parameter Id="M-00FA_A-0001-06-0000_P-5" Name="PercentChangeToSent1" ParameterType="M-00FA_A-0001-06-0000_PT-PercentChangeToSent" Text="Prozentänderung senden bei (Prozent)" Value="3">
 								<Memory CodeSegment="M-00FA_A-0001-06-0000_RS-04-00000" Offset="16" BitOffset="0" />
 							</Parameter>
 							<Parameter Id="M-00FA_A-0001-06-0000_P-6" Name="ErrorMode1" ParameterType="M-00FA_A-0001-06-0000_PT-ErrorMode" Text="Fehler" Value="1">
@@ -94,10 +94,10 @@
 							<Parameter Id="M-00FA_A-0001-06-0000_P-8" Name="DelayedOff1" ParameterType="M-00FA_A-0001-06-0000_PT-DelayedSwitchOffTime" Text="Verzögert Aus" Value="18">
 								<Memory CodeSegment="M-00FA_A-0001-06-0000_RS-04-00000" Offset="22" BitOffset="0" />
 							</Parameter>
-							<Parameter Id="M-00FA_A-0001-06-0000_P-9" Name="Hystereses2" ParameterType="M-00FA_A-0001-06-0000_PT-Hystereses" Text="Hysterese (Prozent)" Value="5">
+							<Parameter Id="M-00FA_A-0001-06-0000_P-9" Name="Hystereses2" ParameterType="M-00FA_A-0001-06-0000_PT-Hystereses" Text="Hysterese (Prozent)" Value="2">
 								<Memory CodeSegment="M-00FA_A-0001-06-0000_RS-04-00000" Offset="23" BitOffset="0" />
 							</Parameter>
-							<Parameter Id="M-00FA_A-0001-06-0000_P-10" Name="PercentChangeToSent2" ParameterType="M-00FA_A-0001-06-0000_PT-PercentChangeToSent" Text="Prozentänderung senden bei (Prozent)" Value="5">
+							<Parameter Id="M-00FA_A-0001-06-0000_P-10" Name="PercentChangeToSent2" ParameterType="M-00FA_A-0001-06-0000_PT-PercentChangeToSent" Text="Prozentänderung senden bei (Prozent)" Value="3">
 								<Memory CodeSegment="M-00FA_A-0001-06-0000_RS-04-00000" Offset="27" BitOffset="0" />
 							</Parameter>
 							<Parameter Id="M-00FA_A-0001-06-0000_P-11" Name="ErrorMode2" ParameterType="M-00FA_A-0001-06-0000_PT-ErrorMode" Text="Fehler" Value="1">
@@ -109,10 +109,10 @@
 							<Parameter Id="M-00FA_A-0001-06-0000_P-13" Name="DelayedOff2" ParameterType="M-00FA_A-0001-06-0000_PT-DelayedSwitchOffTime" Text="Verzögert Aus" Value="18">
 								<Memory CodeSegment="M-00FA_A-0001-06-0000_RS-04-00000" Offset="33" BitOffset="0" />
 							</Parameter>
-							<Parameter Id="M-00FA_A-0001-06-0000_P-14" Name="HystereseSum" ParameterType="M-00FA_A-0001-06-0000_PT-Hystereses" Text="Hysterese (Prozent)" Value="5">
+							<Parameter Id="M-00FA_A-0001-06-0000_P-14" Name="HystereseSum" ParameterType="M-00FA_A-0001-06-0000_PT-Hystereses" Text="Hysterese (Prozent)" Value="2">
 								<Memory CodeSegment="M-00FA_A-0001-06-0000_RS-04-00000" Offset="34" BitOffset="0" />
 							</Parameter>
-							<Parameter Id="M-00FA_A-0001-06-0000_P-15" Name="PercentChangeToSentSum" ParameterType="M-00FA_A-0001-06-0000_PT-PercentChangeToSent" Text="Prozentänderung senden bei (Prozent)" Value="5">
+							<Parameter Id="M-00FA_A-0001-06-0000_P-15" Name="PercentChangeToSentSum" ParameterType="M-00FA_A-0001-06-0000_PT-PercentChangeToSent" Text="Prozentänderung senden bei (Prozent)" Value="3">
 								<Memory CodeSegment="M-00FA_A-0001-06-0000_RS-04-00000" Offset="38" BitOffset="0" />
 							</Parameter>
 							<Parameter Id="M-00FA_A-0001-06-0000_P-16" Name="ErrorModeSum" ParameterType="M-00FA_A-0001-06-0000_PT-ErrorMode" Text="Fehler" Value="1">
