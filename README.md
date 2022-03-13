@@ -1,6 +1,6 @@
 # KnxForceDetector2Channel
 
-ETS configurable force detector sensor based on the [Adafruit QT Py - SAMD21 Dev Board](https://www.adafruit.com/product/4600).
+ETS configurable force detector sensor based on the [Adafruit QT Py - SAMD21 Dev Board](https://www.adafruit.com/product/4600) and MD30-60 thin film force sensors.
 
 This sensor can be used to implement a presence detector for the bed to disable motion sensors.
 
@@ -15,12 +15,14 @@ This sensor can be used to implement a presence detector for the bed to disable 
 * Percent group objects
 * Switch group objects
 * Switch group objects with delayed OFF
+* Lock objects
 * Configurable in ETS
+* Restore of calibration and lock objects after bus reset or power off
 
 ## Required hardware
 
 * [Adafruit QT Py - SAMD21Dev Board](https://www.adafruit.com/product/4600)
-* 2 pieces MD30-60 thin film force sensor
+* 2 pieces MD30-60 thin film force sensors
 * 2 resistors 10kΩ
 * [NanoBCU](https://shop.sirsydom.de/Busankoppler/NanoBCU-Standard.html), not tested, but also the Siemens BCU or other should work.
 * button (used for the programming key)  
@@ -39,8 +41,8 @@ extension
 * Connect the 3,3V, GND to the BCU
 * Connect the TX of the SAMD21 to the RX of the BCU
 * Connect the RX of the SAMD21 to the TX of the BCU
-* Connect one pin of the first 10kΩ to A0, the other pin to 3.3V
-* Connect one pin of the second 10kΩ to A1, the other pin to 3.3V
+* Connect one pin of the first 10kΩ resistor to A0, the other pin to 3.3V
+* Connect one pin of the second 10kΩ resistor to A1, the other pin to 3.3V
 * Connect one pin of the first force detector to A0, the other pin to GND
 * Connect one pin of the first force detector to A1, the other pin to GND
 * Connect the one pin of the button to A2, the other to GND
@@ -76,9 +78,9 @@ Also a virtual channel for OR joining of `1`, `2` and `Summe` is available to co
 
 1) Import the `forcedetector.knproj' created from the previous steps in the ETS product catalog.
 
-2) Add the newly imported sensor application to your project
+1) Add the newly imported sensor application to your project
 
-3) Connect the groups addresses needed for calibration
+1) Connect the groups addresses needed for calibration
 * Diagnose
 * Druck RAW 1
 * Druck Prozent 1
@@ -95,27 +97,31 @@ You don't need to connect the GA's to any other things. We will use the ETS Grou
 
 4) Connect other groups addresses to connect your HW as you want
 
-5) Place the force sensor where you want to measure the pressure, e.g. under the bed feets
+1) Configure the paramters to match your wishes
 
-6) Connect the BCU to the KNX bus
+1) Place the force sensor where you want to measure the pressure, e.g. under the bed feets
 
-7) Press the which you have connected to the A2 pin to enter the address programming mode. The LED should be red now.
+1) Connect the BCU to the KNX bus
 
-8) Program the sensor in ETS. The LED should be turned off
+1) Press the button which you have connected to the A2 pin to enter the address programming mode. The LED should be red now.
 
-9) Open the 'group monitor' window and start the observation
+1) Program the sensor in ETS. The LED should be turned off
 
-10) Send 1 to the GA connected to the `Diagnose` object. The device will transfer now the measurement in the RAW objects. 
+1) Open the 'group monitor' window and start the observation
 
-11) Send a value 10-20% below the RAW value to the GA connected to `Unter Schwelle X` objects (All values below this value will be interpreded as error). 
+1) Send 1 to the GA connected to the `Diagnose` object. The device will transfer now the measurement in the RAW objects. 
 
-12) Burdon now the force sensors (e.g. lie down in the bed)
+1) Send a value ~20% below the matching RAW values to the GA's connected to `Unter Schwelle X` objects (All values below this value will be interpreded as error). 
 
-13) Send a value 10-20% above the RAW value to the GA connected to `Obere Schwelle X` objects (All values above this value will be interpreded as error)
+1) Burdon now the force sensors (e.g. lie down in the bed)
 
-14) Set the `Limit Setzten X` to a percent value which should force the switch of the `Schalten X` objects. 
+1) Send a value ~20% above the matching RAW values to the GA's connected to `Obere Schwelle X` objects (All values above this value will be interpreded as error)
 
-**Note:** The values of `Untere Schwelle 1`, `Untere Schwelle 2`, `Limit Setzten 1`, `Limit Setzten 2`, `Limit Setzten Summe` will be persistent in the flash of the SAMD21. For this reason, the values must not be changed at runtime because the number of write cycles to the flash ared limited to ~10000. After this, the chip gets unusable.
+1) Set the `Limit Setzten X` to a percentage values which should force the switch of the `Schalten X` objects. 
+
+1) Send 0 to the GA connected to the `Diagnose` object. This will stop sending the RAW values to the bus to reduce the traffic on the KNX bus.
+
+**Note:** The values of `Untere Schwelle 1`, `Untere Schwelle 2`, `Limit Setzten 1`, `Limit Setzten 2`, `Limit Setzten Summe`, `Sperre 1`, `Sperre 2`, `Sperre Summe`, `Sperre Beliebiger Druck` will be persistent in the flash of the SAMD21. For this reason, the values must not be changed at runtime to often because the number of write cycles to the flash are limited to ~10000. After this, the chip gets unusable.
 
 # Credits
 
@@ -125,4 +131,4 @@ You don't need to connect the GA's to any other things. We will use the ETS Grou
 
 # License
 
-KnxDistanceDoorFlowerSensor code is licensed under [MIT](LICENSE).
+KnxForceDetector2Channel code is licensed under [MIT](LICENSE).
