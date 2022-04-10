@@ -4,11 +4,11 @@ ETS configurable force detector sensor based on the [Adafruit QT Py - SAMD21 Dev
 
 This sensor can be used to implement a presence detector for the bed to disable motion sensors.
 
-![SAMD 21 board](/assets/images/Sensor.jpg "SAMD 21 board"|width=200)
+![SAMD 21 board](/assets/images/Sensor.jpg|width=200 "SAMD 21 board")
 
-![Force sensor mounting on bed feet](/assets/images/ForceSensorMounting.jpg "Force sensor mounting on bed feet"|width=200)
+![Force sensor mounting on bed feet](/assets/images/ForceSensorMounting.jpg|width=200 "Force sensor mounting on bed feet")
 
-![Force sensor mounted on bed feet](/assets/images/ForceSensorMounted.jpg "Force sensor mounted on bed feet"|width=200)
+![Force sensor mounted on bed feet](/assets/images/ForceSensorMounted.jpg|width=200 "Force sensor mounted on bed feet")
 
 ## Features
 
