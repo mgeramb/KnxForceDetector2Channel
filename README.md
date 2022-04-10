@@ -6,6 +6,8 @@ This sensor can be used to implement a presence detector for the bed to disable 
 
 ![SAMD 21 board](/assets/images/Sensor.jpg "SAMD 21 board")
 
+![Force sensor mounting on bed feet](/assets/images/ForceSensorMounting.jpg "Force sensor mounting on bed feet")
+
 ![Force sensor mounted on bed feet](/assets/images/ForceSensorMounted.jpg "Force sensor mounted on bed feet")
 
 ## Features
