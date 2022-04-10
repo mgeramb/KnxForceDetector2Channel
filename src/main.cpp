@@ -39,12 +39,13 @@ bool started = false;
 
 void progLedOff()
 {
-  pixels.clear();
-  pixels.show();
+  digitalWrite(12, 0); // power off
 }
 
 void progLedOn()
 {
+  digitalWrite(12, 1); // power on
+  delayMicroseconds(20); // give time to start the chip
   pixels.setPixelColor(0, pixels.Color(20, 0, 0));
   pixels.show();
 }
@@ -204,9 +205,11 @@ void loop()
   {
     // Lifetick
     lastLifeTick = now;
-    lifeTick++;
     logValue("Main", "Lifetick", lifeTick);
     goLifeTickCounter->value(lifeTick);
+    lifeTick++;
+    if (lifeTick >= 32768)
+      lifeTick = 1; // reset to 1, using 0 means reboot
     goLifeTick->value(true);
   }
   if (StateWriter::CheckSaveNeededAndResetRequest(now))
